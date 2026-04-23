@@ -15,12 +15,9 @@
  */
 package com.example.unscramble.ui
 
-/**
- * Data class that represents the game UI state
- */
 data class GameState(
-    val currentScrambledWord: String = "",
-    val currentWordCount: Int = 1,
+    val currentWord: String = "",
+    val currentCount: Int = 1,
     val score: Int = 0,
     val isGuessWrong: Boolean = false,
     val isGameOver: Boolean = false

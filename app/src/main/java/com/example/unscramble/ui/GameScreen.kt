@@ -82,8 +82,8 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                 .fillMaxWidth()
                 .wrapContentHeight()
                 .padding(mediumPadding),
-            currentScrambledWord = gameState.currentScrambledWord,
-            wordCount = gameState.currentWordCount,
+            currentScrambledWord = gameState.currentWord,
+            wordCount = gameState.currentCount,
             isGuessWrong = gameState.isGuessWrong,
             userGuess = gameViewModel.userGuess,
             onUserGuessChanged = { gameViewModel.updateGuess(it) },
