@@ -34,8 +34,8 @@ import kotlinx.coroutines.flow.update
 class GameViewModel : ViewModel() {
 
     // Game UI state
-    private val _uiState = MutableStateFlow(GameUiState())
-    val uiState: StateFlow<GameUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(GameState())
+    val uiState: StateFlow<GameState> = _uiState.asStateFlow()
 
     var userGuess by mutableStateOf("")
         private set
@@ -53,7 +53,7 @@ class GameViewModel : ViewModel() {
      */
     fun resetGame() {
         usedWords.clear()
-        _uiState.value = GameUiState(currentScrambledWord = pickRandomWordAndShuffle())
+        _uiState.value = GameState(currentScrambledWord = pickRandomWordAndShuffle())
     }
 
     /*
@@ -76,7 +76,7 @@ class GameViewModel : ViewModel() {
         } else {
             // User's guess is wrong, show an error
             _uiState.update { currentState ->
-                currentState.copy(isGuessedWordWrong = true)
+                currentState.copy(isGuessWrong = true)
             }
         }
         // Reset user guess
@@ -101,7 +101,7 @@ class GameViewModel : ViewModel() {
             //Last round in the game, update isGameOver to true, don't pick a new word
             _uiState.update { currentState ->
                 currentState.copy(
-                    isGuessedWordWrong = false,
+                    isGuessWrong = false,
                     score = updatedScore,
                     isGameOver = true
                 )
@@ -110,7 +110,7 @@ class GameViewModel : ViewModel() {
             // Normal round in the game
             _uiState.update { currentState ->
                 currentState.copy(
-                    isGuessedWordWrong = false,
+                    isGuessWrong = false,
                     currentScrambledWord = pickRandomWordAndShuffle(),
                     currentWordCount = currentState.currentWordCount.inc(),
                     score = updatedScore

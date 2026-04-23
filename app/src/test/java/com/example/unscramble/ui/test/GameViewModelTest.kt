@@ -48,7 +48,7 @@ class GameViewModelTest {
         // Assert that initially the score is 0.
         assertTrue(gameUiState.score == 0)
         // Assert that wrong word guessed is false.
-        assertFalse(gameUiState.isGuessedWordWrong)
+        assertFalse(gameUiState.isGuessWrong)
         // Assert that game is not over.
         assertFalse(gameUiState.isGameOver)
     }
@@ -65,7 +65,7 @@ class GameViewModelTest {
         // Assert that score is unchanged
         assertEquals(0, currentGameUiState.score)
         // Assert that checkUserGuess() method updates isGuessedWordWrong correctly
-        assertTrue(currentGameUiState.isGuessedWordWrong)
+        assertTrue(currentGameUiState.isGuessWrong)
     }
 
     @Test
@@ -78,7 +78,7 @@ class GameViewModelTest {
         currentGameUiState = viewModel.uiState.value
 
         // Assert that checkUserGuess() method updates isGuessedWordWrong is updated correctly.
-        assertFalse(currentGameUiState.isGuessedWordWrong)
+        assertFalse(currentGameUiState.isGuessWrong)
         // Assert that score is updated correctly.
         assertEquals(SCORE_AFTER_FIRST_CORRECT_ANSWER, currentGameUiState.score)
     }

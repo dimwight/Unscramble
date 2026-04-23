@@ -60,7 +60,7 @@ import com.example.unscramble.ui.theme.UnscrambleTheme
 
 @Composable
 fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
-    val gameUiState by gameViewModel.uiState.collectAsState()
+    val gameState by gameViewModel.uiState.collectAsState()
     val mediumPadding = dimensionResource(R.dimen.padding_medium)
 
     Column(
@@ -78,16 +78,16 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
             style = typography.titleLarge,
         )
         GameLayout(
-            onUserGuessChanged = { gameViewModel.updateUserGuess(it) },
-            wordCount = gameUiState.currentWordCount,
-            userGuess = gameViewModel.userGuess,
-            onKeyboardDone = { gameViewModel.checkUserGuess() },
-            currentScrambledWord = gameUiState.currentScrambledWord,
-            isGuessWrong = gameUiState.isGuessedWordWrong,
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
-                .padding(mediumPadding)
+                .padding(mediumPadding),
+            currentScrambledWord = gameState.currentScrambledWord,
+            wordCount = gameState.currentWordCount,
+            isGuessWrong = gameState.isGuessWrong,
+            userGuess = gameViewModel.userGuess,
+            onUserGuessChanged = { gameViewModel.updateUserGuess(it) },
+            onKeyboardDone = { gameViewModel.checkUserGuess() }
         )
         Column(
             modifier = Modifier
@@ -118,11 +118,14 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
             }
         }
 
-        GameStatus(score = gameUiState.score, modifier = Modifier.padding(20.dp))
+        GameStatus(
+            score = gameState.score,
+            modifier = Modifier.padding(20.dp)
+        )
 
-        if (gameUiState.isGameOver) {
+        if (gameState.isGameOver) {
             FinalScoreDialog(
-                score = gameUiState.score,
+                score = gameState.score,
                 onPlayAgain = { gameViewModel.resetGame() }
             )
         }
@@ -145,13 +148,13 @@ fun GameStatus(score: Int, modifier: Modifier = Modifier) {
 
 @Composable
 fun GameLayout(
+    modifier: Modifier = Modifier,
     currentScrambledWord: String,
     wordCount: Int,
     isGuessWrong: Boolean,
     userGuess: String,
     onUserGuessChanged: (String) -> Unit,
-    onKeyboardDone: () -> Unit,
-    modifier: Modifier = Modifier
+    onKeyboardDone: () -> Unit
 ) {
     val mediumPadding = dimensionResource(R.dimen.padding_medium)
 
