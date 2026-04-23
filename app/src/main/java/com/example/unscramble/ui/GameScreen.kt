@@ -86,8 +86,8 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
             wordCount = gameState.currentWordCount,
             isGuessWrong = gameState.isGuessWrong,
             userGuess = gameViewModel.userGuess,
-            onUserGuessChanged = { gameViewModel.updateUserGuess(it) },
-            onKeyboardDone = { gameViewModel.checkUserGuess() }
+            onUserGuessChanged = { gameViewModel.updateGuess(it) },
+            onKeyboardDone = { gameViewModel.checkGuess() }
         )
         Column(
             modifier = Modifier
@@ -99,7 +99,7 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
 
             Button(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = { gameViewModel.checkUserGuess() }
+                onClick = { gameViewModel.checkGuess() }
             ) {
                 Text(
                     text = stringResource(R.string.submit),

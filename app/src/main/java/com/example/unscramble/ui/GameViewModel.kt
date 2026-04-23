@@ -39,8 +39,8 @@ class GameViewModel : ViewModel() {
     var userGuess by mutableStateOf("")
         private set
 
-    fun updateUserGuess(guessedWord: String){
-        userGuess = guessedWord
+    fun updateGuess(guess: String){
+        userGuess = guess
     }
     private var usedWords: MutableSet<String> = mutableSetOf()
     private lateinit var currentWord: String
@@ -51,41 +51,36 @@ class GameViewModel : ViewModel() {
         usedWords.clear()
         _gameState.value = GameState(currentScrambledWord = pickRandomWordAndShuffle())
     }
-    fun checkUserGuess() {
+    fun checkGuess() {
         if (userGuess.equals(currentWord, ignoreCase = true)) {
             // User's guess is correct, increase the score
-            // and call updateGameState() to prepare the game for next round
+            // and call updateStateForScore() to prepare the game for next round
             val updatedScore = _gameState.value.score.plus(SCORE_INCREASE)
-            updateGameState(updatedScore)
+            updateStateForScore(updatedScore)
         } else {
             // User's guess is wrong, show an error
             _gameState.update { currentState ->
                 currentState.copy(isGuessWrong = true)
             }
         }
-        updateUserGuess("")
+        updateGuess("")
     }
 
     /*
      * Skip to next word
      */
     fun skipWord() {
-        updateGameState(_gameState.value.score)
+        updateStateForScore(_gameState.value.score)
         // Reset user guess
-        updateUserGuess("")
+        updateGuess("")
     }
 
-    /*
-     * Picks a new currentWord and currentScrambledWord and updates UiState according to
-     * current game state.
-     */
-    private fun updateGameState(updatedScore: Int) {
+    private fun updateStateForScore(score: Int) {
         if (usedWords.size == MAX_NO_OF_WORDS){
-            //Last round in the game, update isGameOver to true, don't pick a new word
             _gameState.update { current ->
                 current.copy(
                     isGuessWrong = false,
-                    score = updatedScore,
+                    score = score,
                     isGameOver = true
                 )
             }
@@ -96,7 +91,7 @@ class GameViewModel : ViewModel() {
                     isGuessWrong = false,
                     currentScrambledWord = pickRandomWordAndShuffle(),
                     currentWordCount = current.currentWordCount.inc(),
-                    score = updatedScore
+                    score = score
                 )
             }
         }
