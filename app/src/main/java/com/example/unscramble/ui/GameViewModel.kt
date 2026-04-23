@@ -33,53 +33,36 @@ import kotlinx.coroutines.flow.update
  */
 class GameViewModel : ViewModel() {
 
-    // Game UI state
-    private val _uiState = MutableStateFlow(GameState())
-    val uiState: StateFlow<GameState> = _uiState.asStateFlow()
+    private val _gameState = MutableStateFlow(GameState())
+    val uiState: StateFlow<GameState> = _gameState.asStateFlow()
 
     var userGuess by mutableStateOf("")
         private set
 
-    // Set of words used in the game
-    private var usedWords: MutableSet<String> = mutableSetOf()
-    private lateinit var currentWord: String
-
-    init {
-        resetGame()
-    }
-
-    /*
-     * Re-initializes the game data to restart the game.
-     */
-    fun resetGame() {
-        usedWords.clear()
-        _uiState.value = GameState(currentScrambledWord = pickRandomWordAndShuffle())
-    }
-
-    /*
-     * Update the user's guess
-     */
     fun updateUserGuess(guessedWord: String){
         userGuess = guessedWord
     }
-
-    /*
-     * Checks if the user's guess is correct.
-     * Increases the score accordingly.
-     */
+    private var usedWords: MutableSet<String> = mutableSetOf()
+    private lateinit var currentWord: String
+    init {
+        resetGame()
+    }
+    fun resetGame() {
+        usedWords.clear()
+        _gameState.value = GameState(currentScrambledWord = pickRandomWordAndShuffle())
+    }
     fun checkUserGuess() {
         if (userGuess.equals(currentWord, ignoreCase = true)) {
             // User's guess is correct, increase the score
             // and call updateGameState() to prepare the game for next round
-            val updatedScore = _uiState.value.score.plus(SCORE_INCREASE)
+            val updatedScore = _gameState.value.score.plus(SCORE_INCREASE)
             updateGameState(updatedScore)
         } else {
             // User's guess is wrong, show an error
-            _uiState.update { currentState ->
+            _gameState.update { currentState ->
                 currentState.copy(isGuessWrong = true)
             }
         }
-        // Reset user guess
         updateUserGuess("")
     }
 
@@ -87,7 +70,7 @@ class GameViewModel : ViewModel() {
      * Skip to next word
      */
     fun skipWord() {
-        updateGameState(_uiState.value.score)
+        updateGameState(_gameState.value.score)
         // Reset user guess
         updateUserGuess("")
     }
@@ -99,8 +82,8 @@ class GameViewModel : ViewModel() {
     private fun updateGameState(updatedScore: Int) {
         if (usedWords.size == MAX_NO_OF_WORDS){
             //Last round in the game, update isGameOver to true, don't pick a new word
-            _uiState.update { currentState ->
-                currentState.copy(
+            _gameState.update { current ->
+                current.copy(
                     isGuessWrong = false,
                     score = updatedScore,
                     isGameOver = true
@@ -108,11 +91,11 @@ class GameViewModel : ViewModel() {
             }
         } else{
             // Normal round in the game
-            _uiState.update { currentState ->
-                currentState.copy(
+            _gameState.update { current ->
+                current.copy(
                     isGuessWrong = false,
                     currentScrambledWord = pickRandomWordAndShuffle(),
-                    currentWordCount = currentState.currentWordCount.inc(),
+                    currentWordCount = current.currentWordCount.inc(),
                     score = updatedScore
                 )
             }
