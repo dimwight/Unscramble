@@ -56,6 +56,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.unscramble.GameModel
+import com.example.unscramble.GameState
 import com.example.unscramble.R
 import com.example.unscramble.ui.theme.UnscrambleTheme
 
@@ -84,6 +85,8 @@ fun GameScreen() {
                 .fillMaxWidth()
                 .wrapContentHeight()
                 .padding(mediumPadding),
+            gameState=gameState,
+            gameModel=gameModel,
             currentScrambled = gameState.currentWord,
             wordCount = gameState.currentCount,
             isGuessWrong = gameState.isGuessWrong,
@@ -91,7 +94,7 @@ fun GameScreen() {
             onUserGuessChanged = { gameModel.updateGuess(it) },
             onKeyboardDone = { gameModel.checkGuess() }
         )
-        Column(
+       Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(mediumPadding),
@@ -156,8 +159,12 @@ fun GameLayout(
     isGuessWrong: Boolean,
     userGuess: String,
     onUserGuessChanged: (String) -> Unit,
-    onKeyboardDone: () -> Unit
+    onKeyboardDone: () -> Unit,
+    gameModel: GameModel,
+    gameState: GameState
 ) {
+//    val onUserGuessChanged = { gameModel.updateGuess(currentScrambled) }
+    val onKeyboardDone = { gameModel.checkGuess() }
     val mediumPadding = dimensionResource(R.dimen.padding_medium)
 
     Card(
