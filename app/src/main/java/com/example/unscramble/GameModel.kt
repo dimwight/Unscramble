@@ -15,10 +15,10 @@ import kotlinx.coroutines.flow.update
 /**
  * ViewModel containing the app data and methods to process the data
  */
-class GameViewModel : ViewModel() {
+class GameModel : ViewModel() {
 
     private val _gameState = MutableStateFlow(GameState())
-    val uiState: StateFlow<GameState> = _gameState.asStateFlow()
+    val gameState: StateFlow<GameState> = _gameState.asStateFlow()
 
     var userGuess by mutableStateOf("")
         private set

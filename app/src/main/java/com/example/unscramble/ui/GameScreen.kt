@@ -55,13 +55,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.unscramble.GameViewModel
+import com.example.unscramble.GameModel
+import com.example.unscramble.GameState
 import com.example.unscramble.R
 import com.example.unscramble.ui.theme.UnscrambleTheme
 
 @Composable
-fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
-    val gameState by gameViewModel.uiState.collectAsState()
+fun GameScreen() {
+    val gameModel = viewModel()as GameModel
+    val gameState by gameModel.gameState.collectAsState()
     val mediumPadding = dimensionResource(R.dimen.padding_medium)
 
     Column(
@@ -83,12 +85,14 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
                 .fillMaxWidth()
                 .wrapContentHeight()
                 .padding(mediumPadding),
-            currentScrambledWord = gameState.currentWord,
+            gameState=gameState,
+            gameModel=gameModel,
+            currentScrambled = gameState.currentWord,
             wordCount = gameState.currentCount,
             isGuessWrong = gameState.isGuessWrong,
-            userGuess = gameViewModel.userGuess,
-            onUserGuessChanged = { gameViewModel.updateGuess(it) },
-            onKeyboardDone = { gameViewModel.checkGuess() }
+            userGuess = gameModel.userGuess,
+            onGuessChanged = { gameModel.updateGuess(it) },
+            onKeyboardDone = { gameModel.checkGuess() }
         )
         Column(
             modifier = Modifier
@@ -100,7 +104,7 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
 
             Button(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = { gameViewModel.checkGuess() }
+                onClick = { gameModel.checkGuess() }
             ) {
                 Text(
                     text = stringResource(R.string.submit),
@@ -109,7 +113,7 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
             }
 
             OutlinedButton(
-                onClick = { gameViewModel.skipWord() },
+                onClick = { gameModel.skipWord() },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
@@ -127,7 +131,7 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
         if (gameState.isGameOver) {
             FinalScoreDialog(
                 score = gameState.score,
-                onPlayAgain = { gameViewModel.resetGame() }
+                onPlayAgain = { gameModel.resetGame() }
             )
         }
     }
@@ -150,13 +154,18 @@ fun GameStatus(score: Int, modifier: Modifier = Modifier) {
 @Composable
 fun GameLayout(
     modifier: Modifier = Modifier,
-    currentScrambledWord: String,
+    gameState: GameState,
+    gameModel: GameModel,
+    currentScrambled: String,
     wordCount: Int,
     isGuessWrong: Boolean,
     userGuess: String,
-    onUserGuessChanged: (String) -> Unit,
-    onKeyboardDone: () -> Unit
-) {
+    onGuessChanged: (String) -> Unit,
+    onKeyboardDone: () -> Unit,
+    ) {
+    val onGuessChanged = { gameModel.updateGuess(userGuess) }
+    val onKeyboardDone = { gameModel.checkGuess() }
+
     val mediumPadding = dimensionResource(R.dimen.padding_medium)
 
     Card(
@@ -179,7 +188,7 @@ fun GameLayout(
                 color = colorScheme.onPrimary
             )
             Text(
-                text = currentScrambledWord,
+                text = currentScrambled,
                 style = typography.displayMedium
             )
             Text(
@@ -197,7 +206,7 @@ fun GameLayout(
                     unfocusedContainerColor = colorScheme.surface,
                     disabledContainerColor = colorScheme.surface,
                 ),
-                onValueChange = onUserGuessChanged,
+                onValueChange = {onGuessChanged},
                 label = {
                     if (isGuessWrong) {
                         Text(stringResource(R.string.wrong_guess))
