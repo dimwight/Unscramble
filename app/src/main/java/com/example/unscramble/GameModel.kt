@@ -24,7 +24,7 @@ class GameModel : ViewModel() {
         private set
 
     fun updateGuess(guess: String){
-        userGuess = guess
+        userGuess = guess.trim()
     }
     private var usedWords: MutableSet<String> = mutableSetOf()
     private lateinit var currentWord: String

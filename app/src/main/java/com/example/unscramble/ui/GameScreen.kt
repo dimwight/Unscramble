@@ -56,7 +56,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.unscramble.GameModel
-import com.example.unscramble.GameState
 import com.example.unscramble.R
 import com.example.unscramble.ui.theme.UnscrambleTheme
 
@@ -85,13 +84,11 @@ fun GameScreen() {
                 .fillMaxWidth()
                 .wrapContentHeight()
                 .padding(mediumPadding),
-            gameState=gameState,
-            gameModel=gameModel,
             currentScrambled = gameState.currentWord,
             wordCount = gameState.currentCount,
             isGuessWrong = gameState.isGuessWrong,
             userGuess = gameModel.userGuess,
-            onGuessChanged = { gameModel.updateGuess(it) },
+            onUserGuessChanged = { gameModel.updateGuess(it) },
             onKeyboardDone = { gameModel.checkGuess() }
         )
         Column(
@@ -154,18 +151,13 @@ fun GameStatus(score: Int, modifier: Modifier = Modifier) {
 @Composable
 fun GameLayout(
     modifier: Modifier = Modifier,
-    gameState: GameState,
-    gameModel: GameModel,
     currentScrambled: String,
     wordCount: Int,
     isGuessWrong: Boolean,
     userGuess: String,
-    onGuessChanged: (String) -> Unit,
-    onKeyboardDone: () -> Unit,
-    ) {
-    val onGuessChanged = { gameModel.updateGuess(userGuess) }
-    val onKeyboardDone = { gameModel.checkGuess() }
-
+    onUserGuessChanged: (String) -> Unit,
+    onKeyboardDone: () -> Unit
+) {
     val mediumPadding = dimensionResource(R.dimen.padding_medium)
 
     Card(
@@ -206,7 +198,7 @@ fun GameLayout(
                     unfocusedContainerColor = colorScheme.surface,
                     disabledContainerColor = colorScheme.surface,
                 ),
-                onValueChange = {onGuessChanged},
+                onValueChange = onUserGuessChanged,
                 label = {
                     if (isGuessWrong) {
                         Text(stringResource(R.string.wrong_guess))
