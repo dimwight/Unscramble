@@ -27,7 +27,7 @@ class GameModel : ViewModel() {
         userGuess = guess.trim()
     }
     private var usedWords: MutableSet<String> = mutableSetOf()
-    private lateinit var _currentScramble: String
+    private lateinit var currentWord: String
     init {
         resetGame()
     }
@@ -36,7 +36,7 @@ class GameModel : ViewModel() {
         _gameState.value = GameState(currentScramble = pickRandomWordAndShuffle())
     }
     fun checkGuess() {
-        if (userGuess.equals(_currentScramble, ignoreCase = true)) {
+        if (userGuess.equals(currentWord, ignoreCase = true)) {
             // User's guess is correct, increase the score
             // and call updateStateForScore() to prepare the game for next round
             val updatedScore = _gameState.value.score.plus(SCORE_INCREASE)
@@ -82,23 +82,21 @@ class GameModel : ViewModel() {
     }
 
     private fun shuffleCurrentWord(word: String): String {
-        val tempWord = word.toCharArray()
-        // Scramble the word
-        tempWord.shuffle()
-        while (String(tempWord) == word) {
-            tempWord.shuffle()
+        val asChars= word.toCharArray()
+        asChars.shuffle()
+        while (String(asChars) == word) {
+            asChars.shuffle()
         }
-        return String(tempWord)
+        return String(asChars)
     }
 
     private fun pickRandomWordAndShuffle(): String {
-        // Continue picking up a new random word until you get one that hasn't been used before
-        _currentScramble = allWords.random()
-        return if (usedWords.contains(_currentScramble)) {
+        currentWord = allWords.random()
+        return if (usedWords.contains(currentWord)) {
             pickRandomWordAndShuffle()
         } else {
-            usedWords.add(_currentScramble)
-            shuffleCurrentWord(_currentScramble)
+            usedWords.add(currentWord)
+            shuffleCurrentWord(currentWord)
         }
     }
 }

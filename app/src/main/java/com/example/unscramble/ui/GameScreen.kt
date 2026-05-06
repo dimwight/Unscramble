@@ -62,7 +62,7 @@ import com.example.unscramble.ui.theme.UnscrambleTheme
 
 @Composable
 fun GameScreen() {
-    val gameModel = viewModel()as GameModel
+    val gameModel = viewModel() as GameModel
     val gameState by gameModel.gameState.collectAsState()
     val mediumPadding = dimensionResource(R.dimen.padding_medium)
 
@@ -81,20 +81,10 @@ fun GameScreen() {
             style = typography.titleLarge,
         )
         GameLayout(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(mediumPadding),
-            gameState=gameState,
-            gameModel=gameModel,
-            currentScrambled = gameState.currentScramble,
-            wordCount = gameState.currentCount,
-            isGuessWrong = gameState.isGuessWrong,
-            userGuess = gameModel.userGuess,
-            onUserGuessChanged = { gameModel.updateGuess(it) },
-            onKeyboardDone = { gameModel.checkGuess() }
+            gameModel = gameModel,
+            gameState = gameState
         )
-       Column(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(mediumPadding),
@@ -153,13 +143,6 @@ fun GameStatus(score: Int, modifier: Modifier = Modifier) {
 
 @Composable
 fun GameLayout(
-    modifier: Modifier = Modifier,
-    currentScrambled: String,
-    wordCount: Int,
-    isGuessWrong: Boolean,
-    userGuess: String,
-    onUserGuessChanged: (String) -> Unit,
-    onKeyboardDone: () -> Unit,
     gameModel: GameModel,
     gameState: GameState
 ) {
@@ -208,7 +191,7 @@ fun GameLayout(
                     disabledContainerColor = colorScheme.surface,
                 ),
                 onValueChange = {
-                  gameModel.updateGuess(it)
+                    gameModel.updateGuess(it)
                 },
                 label = {
                     if (isGuessWrong) {
@@ -223,7 +206,7 @@ fun GameLayout(
                 ),
                 keyboardActions = KeyboardActions(
                     onDone = {
-                       gameModel.checkGuess()
+                        gameModel.checkGuess()
                     }
                 )
             )
