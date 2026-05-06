@@ -39,10 +39,10 @@ class GameViewModelTest {
          *  viewModel.uiState.value in this class.
          **/
         val gameUiState = viewModel.gameState.value
-        val unScrambledWord = getUnscrambledWord(gameUiState.currentWord)
+        val unScrambledWord = getUnscrambledWord(gameUiState.currentScramble)
 
         // Assert that current word is scrambled.
-        assertNotEquals(unScrambledWord, gameUiState.currentWord)
+        assertNotEquals(unScrambledWord, gameUiState.currentScramble)
         // Assert that current word count is set to 1.
         assertTrue(gameUiState.currentCount == 1)
         // Assert that initially the score is 0.
@@ -71,7 +71,7 @@ class GameViewModelTest {
     @Test
     fun gameViewModel_CorrectWordGuessed_ScoreUpdatedAndErrorFlagUnset() {
         var currentGameUiState = viewModel.gameState.value
-        val correctPlayerWord = getUnscrambledWord(currentGameUiState.currentWord)
+        val correctPlayerWord = getUnscrambledWord(currentGameUiState.currentScramble)
 
         viewModel.updateGuess(correctPlayerWord)
         viewModel.checkGuess()
@@ -86,7 +86,7 @@ class GameViewModelTest {
     @Test
     fun gameViewModel_WordSkipped_ScoreUnchangedAndWordCountIncreased() {
         var currentGameUiState = viewModel.gameState.value
-        val correctPlayerWord = getUnscrambledWord(currentGameUiState.currentWord)
+        val correctPlayerWord = getUnscrambledWord(currentGameUiState.currentScramble)
 
         viewModel.updateGuess(correctPlayerWord)
         viewModel.checkGuess()
@@ -105,14 +105,14 @@ class GameViewModelTest {
     fun gameViewModel_AllWordsGuessed_UiStateUpdatedCorrectly() {
         var expectedScore = 0
         var currentGameUiState = viewModel.gameState.value
-        var correctPlayerWord = getUnscrambledWord(currentGameUiState.currentWord)
+        var correctPlayerWord = getUnscrambledWord(currentGameUiState.currentScramble)
 
         repeat(MAX_NO_OF_WORDS) {
             expectedScore += SCORE_INCREASE
             viewModel.updateGuess(correctPlayerWord)
             viewModel.checkGuess()
             currentGameUiState = viewModel.gameState.value
-            correctPlayerWord = getUnscrambledWord(currentGameUiState.currentWord)
+            correctPlayerWord = getUnscrambledWord(currentGameUiState.currentScramble)
             // Assert that after each correct answer, score is updated correctly.
             assertEquals(expectedScore, currentGameUiState.score)
         }
