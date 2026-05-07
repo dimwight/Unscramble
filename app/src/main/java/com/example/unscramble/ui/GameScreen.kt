@@ -182,6 +182,7 @@ fun GameLayout(
             val isGuessWrong = gameState.isGuessWrong
             OutlinedTextField(
                 value = gameModel.userGuess,
+                supportingText = {Text("Hi")},
                 singleLine = true,
                 shape = shapes.large,
                 modifier = Modifier.fillMaxWidth(),

@@ -23,18 +23,18 @@ class GameModel : ViewModel() {
     var userGuess by mutableStateOf("")
         private set
 
-    fun updateGuess(guess: String){
-        userGuess = guess.trim()
-    }
     private var usedWords: MutableSet<String> = mutableSetOf()
     private lateinit var currentWord: String
+
     init {
         resetGame()
     }
+
     fun resetGame() {
         usedWords.clear()
         _gameState.value = GameState(currentScramble = pickRandomWordAndShuffle())
     }
+
     fun checkGuess() {
         if (userGuess.equals(currentWord, ignoreCase = true)) {
             // User's guess is correct, increase the score
@@ -60,7 +60,7 @@ class GameModel : ViewModel() {
     }
 
     private fun updateStateForScore(score: Int) {
-        if (usedWords.size == MAX_NO_OF_WORDS){
+        if (usedWords.size == MAX_NO_OF_WORDS) {
             _gameState.update { current ->
                 current.copy(
                     isGuessWrong = false,
@@ -68,8 +68,7 @@ class GameModel : ViewModel() {
                     isGameOver = true
                 )
             }
-        } else{
-            // Normal round in the game
+        } else {
             _gameState.update { current ->
                 current.copy(
                     isGuessWrong = false,
@@ -81,22 +80,56 @@ class GameModel : ViewModel() {
         }
     }
 
-    private fun shuffleCurrentWord(word: String): String {
-        val asChars= word.toCharArray()
-        asChars.shuffle()
-        while (String(asChars) == word) {
-            asChars.shuffle()
+    fun updateGuess(guess: String) {
+        var guessChars = guess.trim().toCharArray()
+        val wordChars = currentWord.trim().toCharArray()
+        val wordSize = wordChars.size
+        var badLetter = guessChars.size > wordSize
+        if (badLetter) {
+            guessChars = guessChars.slice(0..wordSize - 1).toCharArray()
+        } else {
+            for (at in 0..guessChars.size - 1) {
+                if (guessChars[at] != wordChars[at]) {
+                    guessChars = guessChars.slice(0..at - 1).toCharArray()
+                    badLetter = true
+                    break
+                }
+            }
         }
+        _gameState.update { current ->
+            current.copy(
+                isGuessWrong = badLetter,
+            )
+        }
+        userGuess = String(guessChars)
+    }
+
+    private fun shuffleCurrentWord(word: String): String {
+        val asChars = word.toCharArray()
+        asChars.shuffle()
+        while (String(asChars) == word) asChars.shuffle()
         return String(asChars)
     }
 
     private fun pickRandomWordAndShuffle(): String {
-        currentWord = allWords.random()
+        val debug = false
+        currentWord = if (debug) "abc" else
+            allWords.random()
         return if (usedWords.contains(currentWord)) {
             pickRandomWordAndShuffle()
         } else {
-            usedWords.add(currentWord)
+            if (!debug) usedWords.add(currentWord)
             shuffleCurrentWord(currentWord)
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
