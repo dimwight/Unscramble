@@ -92,6 +92,7 @@ fun GameScreen() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
+            if (false)
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = { gameModel.checkGuess() }
@@ -179,7 +180,7 @@ fun GameLayout(
                 textAlign = TextAlign.Center,
                 style = typography.titleMedium
             )
-            val isGuessWrong = gameState.isGuessWrong
+            val isGuessWrong = gameState.badChar
             OutlinedTextField(
                 value = gameModel.userGuess,
                 supportingText = {Text("Hi")},
