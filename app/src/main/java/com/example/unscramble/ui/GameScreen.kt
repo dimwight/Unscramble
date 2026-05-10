@@ -15,6 +15,7 @@
  */
 package com.example.unscramble.ui
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -25,11 +26,9 @@ import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -60,6 +59,7 @@ import com.example.unscramble.GameState
 import com.example.unscramble.R
 import com.example.unscramble.ui.theme.UnscrambleTheme
 
+@SuppressLint("SuspiciousIndentation")
 @Composable
 fun GameScreen() {
     val gameModel = viewModel() as GameModel
@@ -92,17 +92,6 @@ fun GameScreen() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            if (false)
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = { gameModel.checkGuess() }
-            ) {
-                Text(
-                    text = stringResource(R.string.submit),
-                    fontSize = 16.sp
-                )
-            }
-
             OutlinedButton(
                 onClick = { gameModel.skipWord() },
                 modifier = Modifier.fillMaxWidth()
@@ -114,10 +103,16 @@ fun GameScreen() {
             }
         }
 
-        GameStatus(
-            score = gameState.score,
+        Card(
             modifier = Modifier.padding(20.dp)
-        )
+        ) {
+            Text(
+                text = stringResource(R.string.score, gameState.score),
+                style = typography.headlineMedium,
+                modifier = Modifier.padding(8.dp)
+            )
+
+        }
 
         if (gameState.isGameOver) {
             FinalScoreDialog(
@@ -125,20 +120,6 @@ fun GameScreen() {
                 onPlayAgain = { gameModel.resetGame() }
             )
         }
-    }
-}
-
-@Composable
-fun GameStatus(score: Int, modifier: Modifier = Modifier) {
-    Card(
-        modifier = modifier
-    ) {
-        Text(
-            text = stringResource(R.string.score, score),
-            style = typography.headlineMedium,
-            modifier = Modifier.padding(8.dp)
-        )
-
     }
 }
 
@@ -180,10 +161,10 @@ fun GameLayout(
                 textAlign = TextAlign.Center,
                 style = typography.titleMedium
             )
-            val isGuessWrong = gameState.badChar
+            val empty = gameModel.thenGuess.isEmpty()
+            val badChar = gameState.badChar
             OutlinedTextField(
-                value = gameModel.userGuess,
-                supportingText = {Text("Hi")},
+                value = gameModel.thenGuess,
                 singleLine = true,
                 shape = shapes.large,
                 modifier = Modifier.fillMaxWidth(),
@@ -193,24 +174,29 @@ fun GameLayout(
                     disabledContainerColor = colorScheme.surface,
                 ),
                 onValueChange = {
+//                    if (!badChar)
                     gameModel.updateGuess(it)
                 },
                 label = {
-                    if (isGuessWrong) {
-                        Text(stringResource(R.string.wrong_guess))
-                    } else {
-                        Text(stringResource(R.string.enter_your_word))
+                    val text = when {
+                        empty && !badChar -> {
+                            "Enter a letter"
+                        }
+
+                        badChar -> {
+                            "Try a different letter"
+                        }
+
+                        else -> {
+                            "Enter another letter"
+                        }
                     }
+                    Text(text)
                 },
-                isError = isGuessWrong,
+                isError = badChar,
                 keyboardOptions = KeyboardOptions.Default.copy(
                     imeAction = ImeAction.Done
                 ),
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        gameModel.checkGuess()
-                    }
-                )
             )
         }
     }
