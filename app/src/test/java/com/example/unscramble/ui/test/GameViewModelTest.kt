@@ -59,7 +59,6 @@ class GameViewModelTest {
         val incorrectPlayerWord = "and"
 
         viewModel.updateGuess(incorrectPlayerWord)
-        viewModel.checkGuess()
 
         val currentGameUiState = viewModel.gameState.value
         // Assert that score is unchanged
@@ -74,7 +73,6 @@ class GameViewModelTest {
         val correctPlayerWord = getUnscrambledWord(currentGameUiState.currentScramble)
 
         viewModel.updateGuess(correctPlayerWord)
-        viewModel.checkGuess()
         currentGameUiState = viewModel.gameState.value
 
         // Assert that checkGuess() method updates isGuessedWordWrong is updated correctly.
@@ -89,7 +87,6 @@ class GameViewModelTest {
         val correctPlayerWord = getUnscrambledWord(currentGameUiState.currentScramble)
 
         viewModel.updateGuess(correctPlayerWord)
-        viewModel.checkGuess()
         currentGameUiState = viewModel.gameState.value
         val lastWordCount = currentGameUiState.currentCount
 
@@ -110,7 +107,6 @@ class GameViewModelTest {
         repeat(MAX_NO_OF_WORDS) {
             expectedScore += SCORE_INCREASE
             viewModel.updateGuess(correctPlayerWord)
-            viewModel.checkGuess()
             currentGameUiState = viewModel.gameState.value
             correctPlayerWord = getUnscrambledWord(currentGameUiState.currentScramble)
             // Assert that after each correct answer, score is updated correctly.
