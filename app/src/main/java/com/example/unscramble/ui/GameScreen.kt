@@ -172,7 +172,7 @@ fun GameLayout(
                 textAlign = TextAlign.Center,
                 style = typography.titleMedium
             )
-            val isGuessWrong = gameState.badChar
+            val badChar = gameState.badChar
             OutlinedTextField(
                 value = gameModel.nowGuess,
                 singleLine = true,
@@ -187,21 +187,14 @@ fun GameLayout(
                     gameModel.updateGuess(it)
                 },
                 label = {
-                    if (isGuessWrong) {
+                    if (badChar) {
                         Text(stringResource(R.string.wrong_guess))
                     } else {
                         Text(stringResource(R.string.enter_your_word))
                     }
                 },
-                isError = isGuessWrong,
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    imeAction = ImeAction.Done
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        gameModel.checkGuess()
-                    }
-                )
+                isError = badChar,
+
             )
         }
     }

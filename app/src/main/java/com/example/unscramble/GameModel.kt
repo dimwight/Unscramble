@@ -43,10 +43,6 @@ class GameModel : ViewModel() {
     }
 
     fun checkGuess() {
-        val guessChanged = nowGuess != thenGuess
-        if (!guessChanged) {
-            return
-        }
         if (nowGuess.equals(currentWord, ignoreCase = true)) {
             val updatedScore = _gameState.value.score.plus(SCORE_INCREASE)
             updateStateForScore(updatedScore)
@@ -69,16 +65,10 @@ class GameModel : ViewModel() {
                 }
             }
         }
-        thenGuess = String(guessChars)
-        if (thenGuess.equals(currentWord, ignoreCase = true)) {
-            val updatedScore = _gameState.value.score.plus(SCORE_INCREASE)
-            updateStateForScore(updatedScore)
-        } else {
-            _gameState.update { currentState ->
-                currentState.copy(badChar = badChar)
-            }
+        _gameState.update { currentState ->
+            currentState.copy(badChar = badChar)
         }
-        updateGuess("")
+        updateGuess(String(guessChars))
     }
 
     /*
@@ -86,7 +76,6 @@ class GameModel : ViewModel() {
      */
     fun skipWord() {
         updateStateForScore(_gameState.value.score)
-        // Reset user guess
         updateGuess("")
     }
 
@@ -100,7 +89,6 @@ class GameModel : ViewModel() {
                 )
             }
         } else {
-            // Normal round in the game
             _gameState.update { current ->
                 current.copy(
                     badChar = false,
@@ -110,6 +98,7 @@ class GameModel : ViewModel() {
                 )
             }
         }
+        updateGuess("")
     }
 
     private fun shuffleCurrentWord(word: String): String {
@@ -122,7 +111,7 @@ class GameModel : ViewModel() {
     }
 
     private fun pickRandomWordAndShuffle(): String {
-        val debug = true
+        val debug = false
         currentWord = if (debug) "abc" else
             allWords.random()
         return if (usedWords.contains(currentWord)) {
