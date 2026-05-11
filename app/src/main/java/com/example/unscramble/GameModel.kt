@@ -44,7 +44,7 @@ class GameModel : ViewModel() {
         } else {
             // User's guess is wrong, show an error
             _gameState.update { currentState ->
-                currentState.copy(isGuessWrong = true)
+                currentState.copy(badChar = true)
             }
         }
         updateGuess("")
@@ -63,7 +63,7 @@ class GameModel : ViewModel() {
         if (usedWords.size == MAX_NO_OF_WORDS){
             _gameState.update { current ->
                 current.copy(
-                    isGuessWrong = false,
+                    badChar = false,
                     score = score,
                     isGameOver = true
                 )
@@ -72,7 +72,7 @@ class GameModel : ViewModel() {
             // Normal round in the game
             _gameState.update { current ->
                 current.copy(
-                    isGuessWrong = false,
+                    badChar = false,
                     currentScramble = pickRandomWordAndShuffle(),
                     currentCount = current.currentCount.inc(),
                     score = score
@@ -91,12 +91,24 @@ class GameModel : ViewModel() {
     }
 
     private fun pickRandomWordAndShuffle(): String {
-        currentWord = allWords.random()
+        val debug = true
+        currentWord = if (debug) "abc" else
+            allWords.random()
         return if (usedWords.contains(currentWord)) {
             pickRandomWordAndShuffle()
         } else {
-            usedWords.add(currentWord)
+            if (!debug) usedWords.add(currentWord)
             shuffleCurrentWord(currentWord)
         }
     }
 }
+
+
+
+
+
+
+
+
+
+

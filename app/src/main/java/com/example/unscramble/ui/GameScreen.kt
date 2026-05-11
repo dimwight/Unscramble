@@ -113,10 +113,17 @@ fun GameScreen() {
             }
         }
 
-        GameStatus(
-            score = gameState.score,
+        Card(
             modifier = Modifier.padding(20.dp)
-        )
+        ) {
+            Text(
+                text = stringResource(R.string.score, gameState.score),
+                style = typography.headlineMedium,
+                modifier = Modifier.padding(8.dp)
+            )
+
+        }
+
 
         if (gameState.isGameOver) {
             FinalScoreDialog(
@@ -124,20 +131,6 @@ fun GameScreen() {
                 onPlayAgain = { gameModel.resetGame() }
             )
         }
-    }
-}
-
-@Composable
-fun GameStatus(score: Int, modifier: Modifier = Modifier) {
-    Card(
-        modifier = modifier
-    ) {
-        Text(
-            text = stringResource(R.string.score, score),
-            style = typography.headlineMedium,
-            modifier = Modifier.padding(8.dp)
-        )
-
     }
 }
 
@@ -179,7 +172,7 @@ fun GameLayout(
                 textAlign = TextAlign.Center,
                 style = typography.titleMedium
             )
-            val isGuessWrong = gameState.isGuessWrong
+            val isGuessWrong = gameState.badChar
             OutlinedTextField(
                 value = gameModel.userGuess,
                 singleLine = true,
