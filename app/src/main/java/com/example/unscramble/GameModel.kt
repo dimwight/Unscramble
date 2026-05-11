@@ -36,6 +36,33 @@ class GameModel : ViewModel() {
         _gameState.value = GameState(currentScramble = pickRandomWordAndShuffle())
     }
     fun checkGuess() {
+        val guessChanged = guess != thenGuess
+        if (!guessChanged){
+            return
+        }
+        if (guess.equals(currentWord, ignoreCase = true)) {
+            val updatedScore = _gameState.value.score.plus(SCORE_INCREASE)
+            updateStateForScore(updatedScore)
+            return
+        }
+        var guessChars = guess.trim().toCharArray()
+        val wordChars = currentWord.trim().toCharArray()
+        var badChar =false
+        val wordSize = wordChars.size
+        if (guessChars.size > wordSize) {
+            guessChars = guessChars.slice(0..wordSize - 1)
+                .toCharArray()
+            badChar=true
+        } else {
+            for (at in 0..guessChars.size - 1) {
+                if (guessChars[at] != wordChars[at]) {
+                    guessChars = guessChars.slice(0..at - 1).toCharArray()
+                    badChar = true
+                    break
+                }
+            }
+        }
+        thenGuess = String(guessChars)
         if (userGuess.equals(currentWord, ignoreCase = true)) {
             // User's guess is correct, increase the score
             // and call updateStateForScore() to prepare the game for next round
