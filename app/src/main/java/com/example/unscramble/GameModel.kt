@@ -20,39 +20,46 @@ class GameModel : ViewModel() {
     private val _gameState = MutableStateFlow(GameState())
     val gameState: StateFlow<GameState> = _gameState.asStateFlow()
 
-    var userGuess by mutableStateOf("")
+    var thenGuess by mutableStateOf("")
+        private set
+    var nowGuess by mutableStateOf("")
         private set
 
-    fun updateGuess(guess: String){
-        userGuess = guess.trim()
+    fun updateGuess(guess: String) {
+        thenGuess = nowGuess
+        nowGuess = guess.trim()
     }
+
     private var usedWords: MutableSet<String> = mutableSetOf()
     private lateinit var currentWord: String
+
     init {
         resetGame()
     }
+
     fun resetGame() {
         usedWords.clear()
         _gameState.value = GameState(currentScramble = pickRandomWordAndShuffle())
     }
+
     fun checkGuess() {
-        val guessChanged = guess != thenGuess
-        if (!guessChanged){
+        val guessChanged = nowGuess != thenGuess
+        if (!guessChanged) {
             return
         }
-        if (guess.equals(currentWord, ignoreCase = true)) {
+        if (nowGuess.equals(currentWord, ignoreCase = true)) {
             val updatedScore = _gameState.value.score.plus(SCORE_INCREASE)
             updateStateForScore(updatedScore)
             return
         }
-        var guessChars = guess.trim().toCharArray()
+        var guessChars = nowGuess.trim().toCharArray()
         val wordChars = currentWord.trim().toCharArray()
-        var badChar =false
+        var badChar = false
         val wordSize = wordChars.size
         if (guessChars.size > wordSize) {
             guessChars = guessChars.slice(0..wordSize - 1)
                 .toCharArray()
-            badChar=true
+            badChar = true
         } else {
             for (at in 0..guessChars.size - 1) {
                 if (guessChars[at] != wordChars[at]) {
@@ -63,15 +70,12 @@ class GameModel : ViewModel() {
             }
         }
         thenGuess = String(guessChars)
-        if (userGuess.equals(currentWord, ignoreCase = true)) {
-            // User's guess is correct, increase the score
-            // and call updateStateForScore() to prepare the game for next round
+        if (thenGuess.equals(currentWord, ignoreCase = true)) {
             val updatedScore = _gameState.value.score.plus(SCORE_INCREASE)
             updateStateForScore(updatedScore)
         } else {
-            // User's guess is wrong, show an error
             _gameState.update { currentState ->
-                currentState.copy(badChar = true)
+                currentState.copy(badChar = badChar)
             }
         }
         updateGuess("")
@@ -87,7 +91,7 @@ class GameModel : ViewModel() {
     }
 
     private fun updateStateForScore(score: Int) {
-        if (usedWords.size == MAX_NO_OF_WORDS){
+        if (usedWords.size == MAX_NO_OF_WORDS) {
             _gameState.update { current ->
                 current.copy(
                     badChar = false,
@@ -95,7 +99,7 @@ class GameModel : ViewModel() {
                     isGameOver = true
                 )
             }
-        } else{
+        } else {
             // Normal round in the game
             _gameState.update { current ->
                 current.copy(
@@ -109,7 +113,7 @@ class GameModel : ViewModel() {
     }
 
     private fun shuffleCurrentWord(word: String): String {
-        val asChars= word.toCharArray()
+        val asChars = word.toCharArray()
         asChars.shuffle()
         while (String(asChars) == word) {
             asChars.shuffle()
