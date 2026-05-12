@@ -43,6 +43,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -59,6 +60,8 @@ import com.example.unscramble.GameModel
 import com.example.unscramble.GameState
 import com.example.unscramble.R
 import com.example.unscramble.ui.theme.UnscrambleTheme
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun GameScreen() {
@@ -173,6 +176,7 @@ fun GameLayout(
                 style = typography.titleMedium
             )
             val badChar = gameState.badChar
+            val scope = rememberCoroutineScope()
             OutlinedTextField(
                 value = gameModel.nowGuess,
                 singleLine = true,
@@ -185,6 +189,10 @@ fun GameLayout(
                 ),
                 onValueChange = {
                     gameModel.updateGuess(it)
+                    scope.launch {
+                        delay(500)
+                        gameModel.checkGuess()
+                    }
                 },
                 label = {
                     if (badChar) {

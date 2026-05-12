@@ -25,11 +25,6 @@ class GameModel : ViewModel() {
     var nowGuess by mutableStateOf("")
         private set
 
-    fun updateGuess(guess: String) {
-        thenGuess = nowGuess
-        nowGuess = guess.trim()
-    }
-
     private var usedWords: MutableSet<String> = mutableSetOf()
     private lateinit var currentWord: String
 
@@ -42,6 +37,11 @@ class GameModel : ViewModel() {
         _gameState.value = GameState(currentScramble = pickRandomWordAndShuffle())
     }
 
+    fun updateGuess(guess: String) {
+        thenGuess = nowGuess
+        nowGuess = guess.trim()
+    }
+
     fun checkGuess() {
         if (nowGuess.equals(currentWord, ignoreCase = true)) {
             val updatedScore = _gameState.value.score.plus(SCORE_INCREASE)
@@ -52,16 +52,28 @@ class GameModel : ViewModel() {
         val wordChars = currentWord.trim().toCharArray()
         var badChar = false
         val wordSize = wordChars.size
-        if (guessChars.size > wordSize) {
-            guessChars = guessChars.slice(0..wordSize - 1)
-                .toCharArray()
-            badChar = true
-        } else {
-            for (at in 0..guessChars.size - 1) {
-                if (guessChars[at] != wordChars[at]) {
-                    guessChars = guessChars.slice(0..at - 1).toCharArray()
-                    badChar = true
-                    break
+        val nowSize = guessChars.size
+        val thenSize = thenGuess.length
+        when {
+            nowSize > wordSize -> {
+                guessChars = guessChars.slice(0..wordSize - 1)
+                    .toCharArray()
+                badChar = true
+            }
+
+            nowSize > thenSize +1
+                    ||nowSize < thenSize -> {
+                guessChars = thenGuess.toCharArray()
+                badChar = true
+            }
+
+            else -> {
+                for (at in 0..nowSize - 1) {
+                    if (guessChars[at] != wordChars[at]) {
+                        guessChars = guessChars.slice(0..at - 1).toCharArray()
+                        badChar = true
+                        break
+                    }
                 }
             }
         }
@@ -111,7 +123,7 @@ class GameModel : ViewModel() {
     }
 
     private fun pickRandomWordAndShuffle(): String {
-        val debug = false
+        val debug = true
         currentWord = if (debug) "abc" else
             allWords.random()
         return if (usedWords.contains(currentWord)) {
