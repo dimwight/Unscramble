@@ -25,8 +25,6 @@ import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -43,14 +41,16 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -83,10 +83,12 @@ fun GameScreen() {
             text = stringResource(R.string.app_name),
             style = typography.titleLarge,
         )
-        GameLayout(
+        val focusRequester = remember { FocusRequester() }
+        GameLayout(focusRequester,
             gameModel = gameModel,
             gameState = gameState
         )
+        focusRequester.requestFocus()
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -139,6 +141,7 @@ fun GameScreen() {
 
 @Composable
 fun GameLayout(
+    focusRequester: FocusRequester,
     gameModel: GameModel,
     gameState: GameState
 ) {
@@ -181,7 +184,8 @@ fun GameLayout(
                 value = gameModel.nowGuess,
                 singleLine = true,
                 shape = shapes.large,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth()
+                    .focusRequester(focusRequester),
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = colorScheme.surface,
                     unfocusedContainerColor = colorScheme.surface,
@@ -189,7 +193,7 @@ fun GameLayout(
                 ),
                 onValueChange = {
                     gameModel.updateGuess(it)
-                    scope.launch {
+                    if (false) scope.launch {
                         delay(500)
                         gameModel.checkGuess()
                     }

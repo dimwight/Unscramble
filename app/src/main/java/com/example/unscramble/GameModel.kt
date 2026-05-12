@@ -37,9 +37,15 @@ class GameModel : ViewModel() {
         _gameState.value = GameState(currentScramble = pickRandomWordAndShuffle())
     }
 
-    fun updateGuess(guess: String) {
+    private var regex = Regex("\\w")
+
+    fun updateGuess(update: String) {
+        val matches = update.matches(regex)
+        println("R1: matches = $matches $regex")
+        if (!matches)return
         thenGuess = nowGuess
-        nowGuess = guess.trim()
+        nowGuess = update.trim()
+        regex = Regex("$nowGuess\\w")
     }
 
     fun checkGuess() {
@@ -88,7 +94,7 @@ class GameModel : ViewModel() {
      */
     fun skipWord() {
         updateStateForScore(_gameState.value.score)
-        updateGuess("")
+        if (true)nowGuess="" else updateGuess("")
     }
 
     private fun updateStateForScore(score: Int) {
