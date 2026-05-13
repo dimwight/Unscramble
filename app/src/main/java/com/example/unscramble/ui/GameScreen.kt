@@ -39,6 +39,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -83,12 +84,10 @@ fun GameScreen() {
             text = stringResource(R.string.app_name),
             style = typography.titleLarge,
         )
-        val focusRequester = remember { FocusRequester() }
-        GameLayout(focusRequester,
+        GameLayout(
             gameModel = gameModel,
             gameState = gameState
         )
-        focusRequester.requestFocus()
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -141,7 +140,6 @@ fun GameScreen() {
 
 @Composable
 fun GameLayout(
-    focusRequester: FocusRequester,
     gameModel: GameModel,
     gameState: GameState
 ) {
@@ -178,6 +176,7 @@ fun GameLayout(
                 textAlign = TextAlign.Center,
                 style = typography.titleMedium
             )
+            val focusRequester = remember { FocusRequester() }
             val badChar = gameState.badChar
             val scope = rememberCoroutineScope()
             OutlinedTextField(
@@ -208,6 +207,9 @@ fun GameLayout(
                 isError = badChar,
 
             )
+            LaunchedEffect(true){
+                focusRequester.requestFocus()
+            }
         }
     }
 }
