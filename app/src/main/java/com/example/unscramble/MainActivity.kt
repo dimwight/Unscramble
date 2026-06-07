@@ -30,7 +30,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        if (false) setContent {
+        if (true) setContent {
             UnscrambleTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
