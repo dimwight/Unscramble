@@ -41,8 +41,8 @@ class GameModel : ViewModel() {
 
     fun updateGuess(update: String) {
         val matches = update.matches(regex)
-        println("R1: matches = $matches $regex")
-        if (!matches)return
+        println("R1: $update = $matches $regex")
+        if (!matches) return
         thenGuess = nowGuess
         nowGuess = update.trim()
         regex = Regex("$nowGuess\\w")
@@ -67,8 +67,49 @@ class GameModel : ViewModel() {
                 badChar = true
             }
 
-            nowSize > thenSize +1
-                    ||nowSize < thenSize -> {
+            nowSize > thenSize + 1
+                    || nowSize < thenSize -> {
+                guessChars = thenGuess.toCharArray()
+                badChar = true
+            }
+
+            else -> {
+                for (at in 0..nowSize - 1) {
+                    if (guessChars[at] != wordChars[at]) {
+                        guessChars = guessChars.slice(0..at - 1).toCharArray()
+                        badChar = true
+                        break
+                    }
+                }
+            }
+        }
+        _gameState.update { currentState ->
+            currentState.copy(badChar = badChar)
+        }
+        updateGuess(String(guessChars))
+    }
+
+    fun checkGuess_() {
+        if (nowGuess.equals(currentWord, ignoreCase = true)) {
+            val updatedScore = _gameState.value.score.plus(SCORE_INCREASE)
+            updateStateForScore(updatedScore)
+            return
+        }
+        var guessChars = nowGuess.trim().toCharArray()
+        val wordChars = currentWord.trim().toCharArray()
+        var badChar = false
+        val wordSize = wordChars.size
+        val nowSize = guessChars.size
+        val thenSize = thenGuess.length
+        when {
+            nowSize > wordSize -> {
+                guessChars = guessChars.slice(0..wordSize - 1)
+                    .toCharArray()
+                badChar = true
+            }
+
+            nowSize > thenSize + 1
+                    || nowSize < thenSize -> {
                 guessChars = thenGuess.toCharArray()
                 badChar = true
             }
@@ -94,7 +135,7 @@ class GameModel : ViewModel() {
      */
     fun skipWord() {
         updateStateForScore(_gameState.value.score)
-        if (true)nowGuess="" else updateGuess("")
+        if (true) nowGuess = "" else updateGuess("")
     }
 
     private fun updateStateForScore(score: Int) {
