@@ -52,6 +52,8 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -179,8 +181,12 @@ fun GameLayout(
             val focusRequester = remember { FocusRequester() }
             val badChar = gameState.badChar
             val scope = rememberCoroutineScope()
+            val guess = gameModel.nowGuess
             OutlinedTextField(
-                value = gameModel.nowGuess,
+                value = TextFieldValue(
+                    text = guess,
+                    selection = TextRange(guess.length)
+                ),
                 singleLine = true,
                 shape = shapes.large,
                 modifier = Modifier.fillMaxWidth()
@@ -191,7 +197,7 @@ fun GameLayout(
                     disabledContainerColor = colorScheme.surface,
                 ),
                 onValueChange = {
-                    gameModel.updateGuess(it)
+                    gameModel.updateGuess(it.text)
                     if (false) scope.launch {
                         delay(500)
                         gameModel.checkGuess()
