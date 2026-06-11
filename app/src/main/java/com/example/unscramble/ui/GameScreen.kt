@@ -200,7 +200,7 @@ fun GameLayout(
                 onValueChange = {
                     gameModel.updateGuess(it.text)
                     if (gameModel.delayGuess) scope.launch {
-                        delay(500)
+                        delay(1000)
                         gameModel.checkGuess()
                     }
                 },

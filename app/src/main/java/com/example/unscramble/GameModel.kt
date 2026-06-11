@@ -18,6 +18,7 @@ import kotlin.text.slice
  */
 class GameModel : ViewModel() {
 
+    private var guessed=false
     val delayGuess=false
     private val _gameState = MutableStateFlow(GameState())
     val gameState: StateFlow<GameState> = _gameState.asStateFlow()
@@ -44,6 +45,7 @@ class GameModel : ViewModel() {
     private var regex = regexNull
 
     fun updateGuess(update: String) {
+        if (!guessed)return
         val update_ = if (update.isEmpty())update else
             update.slice(0..nowGuess.length)
         val matches = update_.matches(regex)
@@ -51,6 +53,7 @@ class GameModel : ViewModel() {
         if (!matches) return
         thenGuess = nowGuess
         nowGuess = update_.trim()
+        guessed=false
         if (!delayGuess) {
             checkGuess()
         }
@@ -78,6 +81,7 @@ class GameModel : ViewModel() {
         _gameState.update { currentState ->
             currentState.copy(badChar = badChar)
         }
+        guessed=true
     }
 
     private fun updateStateForScore(score: Int) {
