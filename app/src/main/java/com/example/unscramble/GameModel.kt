@@ -18,8 +18,8 @@ import kotlin.text.slice
  */
 class GameModel : ViewModel() {
 
-    private var guessed=false
-    val delayGuess=false
+    var guessing=false
+    val delayGuess=true
     private val _gameState = MutableStateFlow(GameState())
     val gameState: StateFlow<GameState> = _gameState.asStateFlow()
 
@@ -45,24 +45,26 @@ class GameModel : ViewModel() {
     private var regex = regexNull
 
     fun updateGuess(update: String) {
-        if (!guessed)return
-        val update_ = if (update.isEmpty())update else
+        println("R1: guessing = $guessing")
+        if (guessing)return
+        val update_ = if (true|| update.isEmpty())update else
             update.slice(0..nowGuess.length)
         val matches = update_.matches(regex)
         println("R1: $update_ = $matches $regex")
         if (!matches) return
         thenGuess = nowGuess
-        nowGuess = update_.trim()
-        guessed=false
+        nowGuess = update_
         if (!delayGuess) {
             checkGuess()
         }
+        guessing=true
     }
 
     fun checkGuess() {
         if (nowGuess.equals(currentWord, ignoreCase = true)) {
             val updatedScore = _gameState.value.score.plus(SCORE_INCREASE)
             updateStateForScore(updatedScore)
+            guessing=false
             return
         }
         var guessChars = nowGuess.toCharArray()
@@ -81,7 +83,7 @@ class GameModel : ViewModel() {
         _gameState.update { currentState ->
             currentState.copy(badChar = badChar)
         }
-        guessed=true
+        guessing=false
     }
 
     private fun updateStateForScore(score: Int) {
@@ -123,7 +125,7 @@ class GameModel : ViewModel() {
     }
 
     private fun pickRandomWordAndShuffle(): String {
-        val debug = true
+        val debug = false
         currentWord = if (debug) "abc" else
             allWords.random().trim()
         return if (usedWords.contains(currentWord)) {

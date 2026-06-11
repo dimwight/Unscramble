@@ -198,9 +198,10 @@ fun GameLayout(
                     disabledContainerColor = colorScheme.surface,
                 ),
                 onValueChange = {
+                    if (gameModel.guessing)return@OutlinedTextField
                     gameModel.updateGuess(it.text)
                     if (gameModel.delayGuess) scope.launch {
-                        delay(1000)
+                        delay(250)
                         gameModel.checkGuess()
                     }
                 },
