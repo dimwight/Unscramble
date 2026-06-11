@@ -37,7 +37,9 @@ class GameModel : ViewModel() {
         _gameState.value = GameState(currentScramble = pickRandomWordAndShuffle())
     }
 
-    private var regex = Regex("\\w")
+    private val regexNull = Regex("\\w")
+
+    private var regex = regexNull
 
     fun updateGuess(update: String) {
         val matches = update.matches(regex)
@@ -45,6 +47,7 @@ class GameModel : ViewModel() {
         if (!matches) return
         thenGuess = nowGuess
         nowGuess = update.trim()
+        checkGuess()
         regex = Regex("$nowGuess\\w")
     }
 
@@ -54,88 +57,22 @@ class GameModel : ViewModel() {
             updateStateForScore(updatedScore)
             return
         }
-        var guessChars = nowGuess.trim().toCharArray()
-        val wordChars = currentWord.trim().toCharArray()
+        var guessChars = nowGuess.toCharArray()
+        val wordChars = currentWord.toCharArray()
         var badChar = false
-        val wordSize = wordChars.size
-        val nowSize = guessChars.size
-        val thenSize = thenGuess.length
-        when {
-            nowSize > wordSize -> {
-                guessChars = guessChars.slice(0..wordSize - 1)
-                    .toCharArray()
+        for (at in 0..guessChars.size - 1) {
+            if (guessChars[at] != wordChars[at]) {
+//                guessChars = guessChars.slice(0..at - 1).toCharArray()
                 badChar = true
-            }
-
-            nowSize > thenSize + 1
-                    || nowSize < thenSize -> {
-                guessChars = thenGuess.toCharArray()
-                badChar = true
-            }
-
-            else -> {
-                for (at in 0..nowSize - 1) {
-                    if (guessChars[at] != wordChars[at]) {
-                        guessChars = guessChars.slice(0..at - 1).toCharArray()
-                        badChar = true
-                        break
-                    }
-                }
+                nowGuess=thenGuess
+                break
             }
         }
+        val listOf = listOf(thenGuess, nowGuess)
+        println("R1: listOf = $listOf")
         _gameState.update { currentState ->
             currentState.copy(badChar = badChar)
         }
-        updateGuess(String(guessChars))
-    }
-
-    fun checkGuess_() {
-        if (nowGuess.equals(currentWord, ignoreCase = true)) {
-            val updatedScore = _gameState.value.score.plus(SCORE_INCREASE)
-            updateStateForScore(updatedScore)
-            return
-        }
-        var guessChars = nowGuess.trim().toCharArray()
-        val wordChars = currentWord.trim().toCharArray()
-        var badChar = false
-        val wordSize = wordChars.size
-        val nowSize = guessChars.size
-        val thenSize = thenGuess.length
-        when {
-            nowSize > wordSize -> {
-                guessChars = guessChars.slice(0..wordSize - 1)
-                    .toCharArray()
-                badChar = true
-            }
-
-            nowSize > thenSize + 1
-                    || nowSize < thenSize -> {
-                guessChars = thenGuess.toCharArray()
-                badChar = true
-            }
-
-            else -> {
-                for (at in 0..nowSize - 1) {
-                    if (guessChars[at] != wordChars[at]) {
-                        guessChars = guessChars.slice(0..at - 1).toCharArray()
-                        badChar = true
-                        break
-                    }
-                }
-            }
-        }
-        _gameState.update { currentState ->
-            currentState.copy(badChar = badChar)
-        }
-        updateGuess(String(guessChars))
-    }
-
-    /*
-     * Skip to next word
-     */
-    fun skipWord() {
-        updateStateForScore(_gameState.value.score)
-        if (true) nowGuess = "" else updateGuess("")
     }
 
     private fun updateStateForScore(score: Int) {
@@ -157,9 +94,16 @@ class GameModel : ViewModel() {
                 )
             }
         }
+        thenGuess=""
+        nowGuess=""
+        regex=regexNull
         updateGuess("")
     }
 
+    fun skipWord() {
+        updateStateForScore(_gameState.value.score)
+        if (true) nowGuess = "" else updateGuess("")
+    }
     private fun shuffleCurrentWord(word: String): String {
         val asChars = word.toCharArray()
         asChars.shuffle()
@@ -170,9 +114,9 @@ class GameModel : ViewModel() {
     }
 
     private fun pickRandomWordAndShuffle(): String {
-        val debug = true
+        val debug = false
         currentWord = if (debug) "abc" else
-            allWords.random()
+            allWords.random().trim()
         return if (usedWords.contains(currentWord)) {
             pickRandomWordAndShuffle()
         } else {
