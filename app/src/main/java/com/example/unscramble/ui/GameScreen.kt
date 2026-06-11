@@ -98,6 +98,7 @@ fun GameScreen() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
+            if (false)
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = { gameModel.checkGuess() }
@@ -198,19 +199,19 @@ fun GameLayout(
                 ),
                 onValueChange = {
                     gameModel.updateGuess(it.text)
-                    if (false) scope.launch {
+                    if (gameModel.delayGuess) scope.launch {
                         delay(500)
                         gameModel.checkGuess()
                     }
                 },
                 label = {
                     if (badChar) {
-                        Text(stringResource(R.string.wrong_guess))
+                        Text(stringResource(R.string.bad_char))
                     } else {
-                        Text(stringResource(R.string.enter_your_word))
+                        Text(stringResource(R.string.enter_letter))
                     }
                 },
-                isError = badChar,
+                isError = badChar
 
             )
             LaunchedEffect(true){

@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.update
  */
 class GameModel : ViewModel() {
 
+    val delayGuess=true
     private val _gameState = MutableStateFlow(GameState())
     val gameState: StateFlow<GameState> = _gameState.asStateFlow()
 
@@ -47,8 +48,9 @@ class GameModel : ViewModel() {
         if (!matches) return
         thenGuess = nowGuess
         nowGuess = update.trim()
-        checkGuess()
-        regex = Regex("$nowGuess\\w")
+        if (!delayGuess) {
+            checkGuess()
+        }
     }
 
     fun checkGuess() {
@@ -70,6 +72,7 @@ class GameModel : ViewModel() {
         }
         val listOf = listOf(thenGuess, nowGuess)
         println("R1: listOf = $listOf")
+        regex = Regex("$nowGuess\\w")
         _gameState.update { currentState ->
             currentState.copy(badChar = badChar)
         }
@@ -114,7 +117,7 @@ class GameModel : ViewModel() {
     }
 
     private fun pickRandomWordAndShuffle(): String {
-        val debug = false
+        val debug = true
         currentWord = if (debug) "abc" else
             allWords.random().trim()
         return if (usedWords.contains(currentWord)) {
