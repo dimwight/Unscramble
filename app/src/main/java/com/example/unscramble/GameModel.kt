@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlin.text.slice
 
 /**
  * ViewModel containing the app data and methods to process the data
@@ -43,11 +44,13 @@ class GameModel : ViewModel() {
     private var regex = regexNull
 
     fun updateGuess(update: String) {
-        val matches = update.matches(regex)
-        println("R1: $update = $matches $regex")
+        val update_ = if (true)update else
+            update.slice(0..nowGuess.length)
+        val matches = update_.matches(regex)
+        println("R1: $update_ = $matches $regex")
         if (!matches) return
         thenGuess = nowGuess
-        nowGuess = update.trim()
+        nowGuess = update_.trim()
         if (!delayGuess) {
             checkGuess()
         }
@@ -64,7 +67,6 @@ class GameModel : ViewModel() {
         var badChar = false
         for (at in 0..guessChars.size - 1) {
             if (guessChars[at] != wordChars[at]) {
-//                guessChars = guessChars.slice(0..at - 1).toCharArray()
                 badChar = true
                 nowGuess=thenGuess
                 break
