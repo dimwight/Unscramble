@@ -190,7 +190,8 @@ fun GameLayout(
                 ),
                 singleLine = true,
                 shape = shapes.large,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .focusRequester(focusRequester),
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = colorScheme.surface,
@@ -198,9 +199,11 @@ fun GameLayout(
                     disabledContainerColor = colorScheme.surface,
                 ),
                 onValueChange = {
-                    if (gameModel.guessing)return@OutlinedTextField
+                    val ug = gameModel.guessing
+                    println("R1: onValueChange $ug")
+                    if (ug)return@OutlinedTextField
                     gameModel.updateGuess(it.text)
-                    if (gameModel.delayGuess) scope.launch {
+                    scope.launch {
                         delay(250)
                         gameModel.checkGuess()
                     }

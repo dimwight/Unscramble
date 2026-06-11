@@ -11,15 +11,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlin.text.slice
 
-/**
- * ViewModel containing the app data and methods to process the data
- */
-class GameModel : ViewModel() {
+class GameModel: ViewModel() {
 
     var guessing=false
-    val delayGuess=true
     private val _gameState = MutableStateFlow(GameState())
     val gameState: StateFlow<GameState> = _gameState.asStateFlow()
 
@@ -40,31 +35,21 @@ class GameModel : ViewModel() {
         _gameState.value = GameState(currentScramble = pickRandomWordAndShuffle())
     }
 
-    private val regexNull = Regex("\\w")
-
-    private var regex = regexNull
-
     fun updateGuess(update: String) {
-        println("R1: guessing = $guessing")
+        println("R1: updateGuess $guessing")
         if (guessing)return
-        val update_ = if (true|| update.isEmpty())update else
-            update.slice(0..nowGuess.length)
-        val matches = update_.matches(regex)
-        println("R1: $update_ = $matches $regex")
-        if (!matches) return
         thenGuess = nowGuess
-        nowGuess = update_
-        if (!delayGuess) {
-            checkGuess()
-        }
+        nowGuess = update
         guessing=true
+        println("R1: updateGuess- $guessing")
     }
 
     fun checkGuess() {
+        guessing=false
+        println("R1: checkGuess $guessing")
         if (nowGuess.equals(currentWord, ignoreCase = true)) {
             val updatedScore = _gameState.value.score.plus(SCORE_INCREASE)
             updateStateForScore(updatedScore)
-            guessing=false
             return
         }
         var guessChars = nowGuess.toCharArray()
@@ -77,13 +62,11 @@ class GameModel : ViewModel() {
                 break
             }
         }
-        val listOf = listOf(thenGuess, nowGuess)
+       val listOf = listOf(thenGuess, nowGuess)
         println("R1: listOf = $listOf")
-        regex = Regex("$nowGuess\\w")
         _gameState.update { currentState ->
             currentState.copy(badChar = badChar)
         }
-        guessing=false
     }
 
     private fun updateStateForScore(score: Int) {
@@ -107,13 +90,14 @@ class GameModel : ViewModel() {
         }
         thenGuess=""
         nowGuess=""
-        regex=regexNull
         updateGuess("")
+        guessing=false
+        println("R1: updateStateForScore- $guessing")
     }
 
     fun skipWord() {
         updateStateForScore(_gameState.value.score)
-        if (true) nowGuess = "" else updateGuess("")
+        nowGuess = ""
     }
     private fun shuffleCurrentWord(word: String): String {
         val asChars = word.toCharArray()
