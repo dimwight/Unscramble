@@ -15,7 +15,6 @@
  */
 package com.example.unscramble.ui
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -26,9 +25,9 @@ import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -40,15 +39,21 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -58,8 +63,9 @@ import com.example.unscramble.GameModel
 import com.example.unscramble.GameState
 import com.example.unscramble.R
 import com.example.unscramble.ui.theme.UnscrambleTheme
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
-@SuppressLint("SuspiciousIndentation")
 @Composable
 fun GameScreen() {
     val gameModel = viewModel() as GameModel
@@ -92,6 +98,18 @@ fun GameScreen() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
+            if (false) {
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = { gameModel.checkGuess() }
+                ) {
+                    Text(
+                        text = stringResource(R.string.submit),
+                        fontSize = 16.sp
+                    )
+                }
+            }
+
             OutlinedButton(
                 onClick = { gameModel.skipWord() },
                 modifier = Modifier.fillMaxWidth()
@@ -113,6 +131,7 @@ fun GameScreen() {
             )
 
         }
+
 
         if (gameState.isGameOver) {
             FinalScoreDialog(
@@ -161,43 +180,48 @@ fun GameLayout(
                 textAlign = TextAlign.Center,
                 style = typography.titleMedium
             )
-            val empty = gameModel.thenGuess.isEmpty()
+            val focusRequester = remember { FocusRequester() }
             val badChar = gameState.badChar
+            val scope = rememberCoroutineScope()
+            val guess = gameModel.nowGuess
             OutlinedTextField(
-                value = gameModel.thenGuess,
+                value = TextFieldValue(
+                    text = guess,
+                    selection = TextRange(guess.length)
+                ),
                 singleLine = true,
                 shape = shapes.large,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(focusRequester),
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = colorScheme.surface,
                     unfocusedContainerColor = colorScheme.surface,
                     disabledContainerColor = colorScheme.surface,
                 ),
                 onValueChange = {
-//                    if (!badChar)
-                    gameModel.updateGuess(it)
+                    val awaiting = gameModel.awaitingCheck
+                    println("R1: onValueChange $awaiting")
+                    if (awaiting)return@OutlinedTextField
+                    gameModel.updateGuess(it.text)
+                    scope.launch {
+                        delay(250)
+                        gameModel.checkGuess()
+                    }
                 },
                 label = {
-                    val text = when {
-                        empty && !badChar -> {
-                            "Enter a letter"
-                        }
-
-                        badChar -> {
-                            "Try a different letter"
-                        }
-
-                        else -> {
-                            "Enter another letter"
-                        }
+                    if (badChar) {
+                        Text(stringResource(R.string.bad_guess))
+                    } else {
+                        Text(stringResource(R.string.enter_letter))
                     }
-                    Text(text)
                 },
-                isError = badChar,
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    imeAction = ImeAction.Done
-                ),
+                isError = badChar
+
             )
+            LaunchedEffect(true){
+                focusRequester.requestFocus()
+            }
         }
     }
 }

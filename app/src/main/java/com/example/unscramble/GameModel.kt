@@ -12,15 +12,15 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-/**
- * ViewModel containing the app data and methods to process the data
- */
-class GameModel : ViewModel() {
+class GameModel: ViewModel() {
 
+    var awaitingCheck=false
     private val _gameState = MutableStateFlow(GameState())
     val gameState: StateFlow<GameState> = _gameState.asStateFlow()
 
     var thenGuess by mutableStateOf("")
+        private set
+    var nowGuess by mutableStateOf("")
         private set
 
     private var usedWords: MutableSet<String> = mutableSetOf()
@@ -35,13 +35,39 @@ class GameModel : ViewModel() {
         _gameState.value = GameState(currentScramble = pickRandomWordAndShuffle())
     }
 
-    /*
-     * Skip to next word
-     */
-    fun skipWord() {
-        updateStateForScore(_gameState.value.score)
-        // Reset user guess
-        updateGuess("")
+    fun updateGuess(update: String) {
+        println("R1: update = $update")
+        println("R1: updateGuess $awaitingCheck")
+        if (awaitingCheck)return
+        thenGuess = nowGuess
+        nowGuess = update.trim()
+        awaitingCheck=true
+        println("R1: updateGuess- $awaitingCheck")
+    }
+
+    fun checkGuess() {
+        awaitingCheck=false
+        println("R1: checkGuess $awaitingCheck")
+        if (nowGuess.equals(currentWord, ignoreCase = true)) {
+            val updatedScore = _gameState.value.score.plus(SCORE_INCREASE)
+            updateStateForScore(updatedScore)
+            return
+        }
+        var guessChars = nowGuess.toCharArray()
+        val wordChars = currentWord.toCharArray()
+        var badChar = false
+        for (at in 0..guessChars.size - 1) {
+            if (guessChars[at] != wordChars[at]) {
+                badChar = true
+                nowGuess=thenGuess
+                break
+            }
+        }
+       val listOf = listOf(thenGuess, nowGuess)
+        println("R1: listOf = $listOf")
+        _gameState.update { current ->
+            current.copy(badChar = badChar)
+        }
     }
 
     private fun updateStateForScore(score: Int) {
@@ -63,58 +89,30 @@ class GameModel : ViewModel() {
                 )
             }
         }
+        thenGuess=""
+        nowGuess=""
+        updateGuess("")
+        awaitingCheck=false
+        println("R1: updateStateForScore- $awaitingCheck")
     }
 
-    fun updateGuess(guess: String) {
-        val guessChanged = guess != thenGuess
-        if (!guessChanged){
-            return
-        }
-        if (guess.equals(currentWord, ignoreCase = true)) {
-            val updatedScore = _gameState.value.score.plus(SCORE_INCREASE)
-            updateStateForScore(updatedScore)
-            return
-        }
-        var guessChars = guess.trim().toCharArray()
-        val wordChars = currentWord.trim().toCharArray()
-        var badChar =false
-        val wordSize = wordChars.size
-        if (guessChars.size > wordSize) {
-            guessChars = guessChars.slice(0..wordSize - 1)
-                .toCharArray()
-            badChar=true
-        } else {
-            for (at in 0..guessChars.size - 1) {
-                if (guessChars[at] != wordChars[at]) {
-                    guessChars = guessChars.slice(0..at - 1).toCharArray()
-                    badChar = true
-                    break
-                }
-            }
-        }
-        updateBadChar(badChar)
-        thenGuess = String(guessChars)
+    fun skipWord() {
+        updateStateForScore(_gameState.value.score)
+        nowGuess = ""
     }
-
-    private fun updateBadChar(badChar: Boolean) {
-        _gameState.update { current ->
-            current.copy(
-                badChar = badChar
-            )
-        }
-    }
-
     private fun shuffleCurrentWord(word: String): String {
         val asChars = word.toCharArray()
         asChars.shuffle()
-        while (String(asChars) == word) asChars.shuffle()
+        while (String(asChars) == word) {
+            asChars.shuffle()
+        }
         return String(asChars)
     }
 
     private fun pickRandomWordAndShuffle(): String {
         val debug = true
-        currentWord = if (debug) "abc" else
-            allWords.random()
+        currentWord = if (debug) "dank" else
+            allWords.random().trim()
         return if (usedWords.contains(currentWord)) {
             pickRandomWordAndShuffle()
         } else {
