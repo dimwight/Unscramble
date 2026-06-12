@@ -28,5 +28,16 @@
     <string name="exit">Exit</string>
     <string name="play_again">Play Again</string>
     <string name="wrong_guess">Wrong guess!</string>
-    <string name="bad_char">Bad letter, try another!</string>
+    <string name="bad_guess">Bad guess, try another letter!</string>
 </resources>
+
+
+
+
+
+
+
+
+
+
+

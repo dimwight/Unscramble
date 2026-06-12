@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.update
 
 class GameModel: ViewModel() {
 
-    var guessing=false
+    var awaitingCheck=false
     private val _gameState = MutableStateFlow(GameState())
     val gameState: StateFlow<GameState> = _gameState.asStateFlow()
 
@@ -37,17 +37,17 @@ class GameModel: ViewModel() {
 
     fun updateGuess(update: String) {
         println("R1: update = $update")
-        println("R1: updateGuess $guessing")
-        if (guessing)return
+        println("R1: updateGuess $awaitingCheck")
+        if (awaitingCheck)return
         thenGuess = nowGuess
         nowGuess = update.trim()
-        guessing=true
-        println("R1: updateGuess- $guessing")
+        awaitingCheck=true
+        println("R1: updateGuess- $awaitingCheck")
     }
 
     fun checkGuess() {
-        guessing=false
-        println("R1: checkGuess $guessing")
+        awaitingCheck=false
+        println("R1: checkGuess $awaitingCheck")
         if (nowGuess.equals(currentWord, ignoreCase = true)) {
             val updatedScore = _gameState.value.score.plus(SCORE_INCREASE)
             updateStateForScore(updatedScore)
@@ -65,8 +65,8 @@ class GameModel: ViewModel() {
         }
        val listOf = listOf(thenGuess, nowGuess)
         println("R1: listOf = $listOf")
-        _gameState.update { currentState ->
-            currentState.copy(badChar = badChar)
+        _gameState.update { current ->
+            current.copy(badChar = badChar)
         }
     }
 
@@ -92,8 +92,8 @@ class GameModel: ViewModel() {
         thenGuess=""
         nowGuess=""
         updateGuess("")
-        guessing=false
-        println("R1: updateStateForScore- $guessing")
+        awaitingCheck=false
+        println("R1: updateStateForScore- $awaitingCheck")
     }
 
     fun skipWord() {
@@ -110,8 +110,8 @@ class GameModel: ViewModel() {
     }
 
     private fun pickRandomWordAndShuffle(): String {
-        val debug = false
-        currentWord = if (debug) "dance" else
+        val debug = true
+        currentWord = if (debug) "dank" else
             allWords.random().trim()
         return if (usedWords.contains(currentWord)) {
             pickRandomWordAndShuffle()

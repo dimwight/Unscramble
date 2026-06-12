@@ -98,15 +98,16 @@ fun GameScreen() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            if (false)
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = { gameModel.checkGuess() }
-            ) {
-                Text(
-                    text = stringResource(R.string.submit),
-                    fontSize = 16.sp
-                )
+            if (false) {
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = { gameModel.checkGuess() }
+                ) {
+                    Text(
+                        text = stringResource(R.string.submit),
+                        fontSize = 16.sp
+                    )
+                }
             }
 
             OutlinedButton(
@@ -199,9 +200,9 @@ fun GameLayout(
                     disabledContainerColor = colorScheme.surface,
                 ),
                 onValueChange = {
-                    val ug = gameModel.guessing
-                    println("R1: onValueChange $ug")
-                    if (ug)return@OutlinedTextField
+                    val awaiting = gameModel.awaitingCheck
+                    println("R1: onValueChange $awaiting")
+                    if (awaiting)return@OutlinedTextField
                     gameModel.updateGuess(it.text)
                     scope.launch {
                         delay(250)
@@ -210,7 +211,7 @@ fun GameLayout(
                 },
                 label = {
                     if (badChar) {
-                        Text(stringResource(R.string.bad_char))
+                        Text(stringResource(R.string.bad_guess))
                     } else {
                         Text(stringResource(R.string.enter_letter))
                     }
