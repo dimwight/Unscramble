@@ -36,10 +36,11 @@ class GameModel: ViewModel() {
     }
 
     fun updateGuess(update: String) {
+        println("R1: update = $update")
         println("R1: updateGuess $guessing")
         if (guessing)return
         thenGuess = nowGuess
-        nowGuess = update
+        nowGuess = update.trim()
         guessing=true
         println("R1: updateGuess- $guessing")
     }
@@ -110,7 +111,7 @@ class GameModel: ViewModel() {
 
     private fun pickRandomWordAndShuffle(): String {
         val debug = false
-        currentWord = if (debug) "abc" else
+        currentWord = if (debug) "dance" else
             allWords.random().trim()
         return if (usedWords.contains(currentWord)) {
             pickRandomWordAndShuffle()
