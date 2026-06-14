@@ -14,6 +14,8 @@ import kotlinx.coroutines.flow.update
 
 class GameModel: ViewModel() {
 
+    private var guesses =0
+        get() = field
     var awaitingCheck=false
     private val _gameState = MutableStateFlow(GameState())
     val gameState: StateFlow<GameState> = _gameState.asStateFlow()
@@ -66,7 +68,10 @@ class GameModel: ViewModel() {
        val listOf = listOf(thenGuess, nowGuess)
         println("R1: listOf = $listOf")
         _gameState.update { current ->
-            current.copy(badChar = badChar)
+            current.copy(
+                badChar = badChar,
+                guesses = current.guesses.inc()
+            )
         }
     }
 
@@ -74,14 +79,17 @@ class GameModel: ViewModel() {
         if (usedWords.size == MAX_NO_OF_WORDS) {
             _gameState.update { current ->
                 current.copy(
-                    badChar = false,
+//                    badChar = false,
                     score = score,
                     isGameOver = true
                 )
             }
         } else {
+            guesses = _gameState.value.guesses
             _gameState.update { current ->
                 current.copy(
+                    hasGuessed = true,
+                    guesses = 0,
                     badChar = false,
                     currentScramble = pickRandomWordAndShuffle(),
                     currentCount = current.currentCount.inc(),
@@ -111,7 +119,7 @@ class GameModel: ViewModel() {
 
     private fun pickRandomWordAndShuffle(): String {
         val debug = true
-        currentWord = if (debug) "dank" else
+        currentWord = if (debug) "abc" else
             allWords.random().trim()
         return if (usedWords.contains(currentWord)) {
             pickRandomWordAndShuffle()

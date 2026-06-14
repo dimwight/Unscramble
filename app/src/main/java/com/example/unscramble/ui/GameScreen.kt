@@ -133,15 +133,83 @@ fun GameScreen() {
         }
 
 
-        if (gameState.isGameOver) {
-            FinalScoreDialog(
-                score = gameState.score,
-                onPlayAgain = { gameModel.resetGame() }
-            )
+        when {
+            gameState.hasGuessed -> {
+                GuessesDialog(
+                    guesses = gameState.guesses,
+                )
+            }
+            gameState.isGameOver -> {
+                FinalScoreDialog(
+                    score = gameState.score,
+                    onPlayAgain = { gameModel.resetGame() }
+                )
+            }
         }
     }
 }
 
+@Composable
+private fun GuessesDialog(
+    guesses: Int,
+    modifier: Modifier = Modifier
+) {
+    val activity = (LocalContext.current as Activity)
+
+    AlertDialog(
+        onDismissRequest = {},
+        title = { Text(text = stringResource(R.string.congratulations)) },
+        text = { Text(text = stringResource(R.string.you_scored, guesses)) },
+        modifier = modifier,
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    activity.finish()
+                }
+            ) {
+                Text(text = stringResource(R.string.exit))
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = {}) {
+                Text(text = stringResource(R.string.play_again))
+            }
+        }
+    )
+}
+@Composable
+private fun FinalScoreDialog(
+    score: Int,
+    onPlayAgain: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val activity = (LocalContext.current as Activity)
+
+    AlertDialog(
+        onDismissRequest = {
+            // Dismiss the dialog when the user clicks outside the dialog or on the back
+            // button. If you want to disable that functionality, simply use an empty
+            // onCloseRequest.
+        },
+        title = { Text(text = stringResource(R.string.congratulations)) },
+        text = { Text(text = stringResource(R.string.you_scored, score)) },
+        modifier = modifier,
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    activity.finish()
+                }
+            ) {
+                Text(text = stringResource(R.string.exit))
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onPlayAgain) {
+                Text(text = stringResource(R.string.play_again))
+            }
+        }
+    )
+}
 @Composable
 fun GameLayout(
     gameModel: GameModel,
@@ -226,42 +294,6 @@ fun GameLayout(
     }
 }
 
-/*
- * Creates and shows an AlertDialog with final score.
- */
-@Composable
-private fun FinalScoreDialog(
-    score: Int,
-    onPlayAgain: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val activity = (LocalContext.current as Activity)
-
-    AlertDialog(
-        onDismissRequest = {
-            // Dismiss the dialog when the user clicks outside the dialog or on the back
-            // button. If you want to disable that functionality, simply use an empty
-            // onCloseRequest.
-        },
-        title = { Text(text = stringResource(R.string.congratulations)) },
-        text = { Text(text = stringResource(R.string.you_scored, score)) },
-        modifier = modifier,
-        dismissButton = {
-            TextButton(
-                onClick = {
-                    activity.finish()
-                }
-            ) {
-                Text(text = stringResource(R.string.exit))
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onPlayAgain) {
-                Text(text = stringResource(R.string.play_again))
-            }
-        }
-    )
-}
 
 @Preview(showBackground = true)
 @Composable
