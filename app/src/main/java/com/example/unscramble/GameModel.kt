@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.update
 
 class GameModel : ViewModel() {
 
+    var currentScramble: String=""
     var guesses = 0
         get() = field
     var inputBlocked = false
@@ -35,7 +36,7 @@ class GameModel : ViewModel() {
 
     fun resetGame() {
         usedWords.clear()
-        _gameState.value = GameState(currentScramble = pickRandomWordAndShuffle())
+        currentScramble = pickRandomWordAndShuffle()
     }
 
     fun updateGuess(update: String) {
@@ -98,10 +99,10 @@ class GameModel : ViewModel() {
     }
 
     fun continueGame() {
+        currentScramble = pickRandomWordAndShuffle()
         _gameState.update {
             it.copy(
                 hasGuessed = false,
-                currentScramble = pickRandomWordAndShuffle(),
                 currentCount = it.currentCount.inc(),
             )
         }

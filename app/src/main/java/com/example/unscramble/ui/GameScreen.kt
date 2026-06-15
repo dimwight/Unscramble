@@ -240,7 +240,7 @@ fun GameLayout(
                 color = colorScheme.onPrimary
             )
             Text(
-                text = gameState.currentScramble,
+                text = gameModel.currentScramble,
                 style = typography.displayMedium
             )
             Text(
