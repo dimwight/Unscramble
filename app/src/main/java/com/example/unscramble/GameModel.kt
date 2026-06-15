@@ -51,11 +51,7 @@ class GameModel : ViewModel() {
     fun checkGuess() {
         inputBlocked = false
         println("R1: checkGuess $inputBlocked")
-        _gameState.update {
-            it.copy(
-                guesses = it.guesses.inc()
-            )
-        }
+        guesses++
         if (nowGuess.equals(currentWord, ignoreCase = true)) {
             val updatedScore = _gameState.value.score.plus(SCORE_INCREASE)
             updateStateForScore(updatedScore)
@@ -89,11 +85,11 @@ class GameModel : ViewModel() {
                 )
             }
         } else {
-            guesses = _gameState.value.guesses
+//            guesses = _gameState.value.guesses
             _gameState.update {
                 it.copy(
                     hasGuessed = true,
-                    guesses = 1,
+//                    guesses = 1,
                     badChar = false,
                 )
             }
@@ -109,6 +105,7 @@ class GameModel : ViewModel() {
                 currentCount = it.currentCount.inc(),
             )
         }
+        guesses=0
         thenGuess = ""
         nowGuess = ""
         updateGuess("")
