@@ -58,7 +58,7 @@ class GameModel : ViewModel() {
             updateStateForScore(updatedScore)
             return
         }
-        var guessChars = nowGuess.toCharArray()
+        val guessChars = nowGuess.toCharArray()
         val wordChars = currentWord.toCharArray()
         var badChar = false
         for (at in 0..guessChars.size - 1) {
@@ -86,11 +86,9 @@ class GameModel : ViewModel() {
                 )
             }
         } else {
-//            guesses = _gameState.value.guesses
             _gameState.update {
                 it.copy(
                     hasGuessed = true,
-//                    guesses = 1,
                     badChar = false,
                 )
             }
