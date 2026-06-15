@@ -61,7 +61,7 @@ class GameModel : ViewModel() {
         val guessChars = nowGuess.toCharArray()
         val wordChars = currentWord.toCharArray()
         var badChar = false
-        for (at in 0..guessChars.size - 1) {
+        for (at in 0..<guessChars.size) {
             if (guessChars[at] != wordChars[at]) {
                 badChar = true
                 nowGuess = thenGuess
