@@ -129,15 +129,14 @@ fun GameScreen() {
                 style = typography.headlineMedium,
                 modifier = Modifier.padding(8.dp)
             )
-
         }
-
 
         when {
             gameState.hasGuessed -> {
                 GuessesDialog(
-                    guesses = gameState.guesses,
-                )
+                    guesses = gameModel.guesses,
+                    word = gameModel.currentWord,
+                ) { gameModel.continueGame() }
             }
             gameState.isGameOver -> {
                 FinalScoreDialog(
@@ -152,15 +151,16 @@ fun GameScreen() {
 @Composable
 private fun GuessesDialog(
     guesses: Int,
-    modifier: Modifier = Modifier
+    word: String,
+    onGuessAgain: () -> Unit,
 ) {
     val activity = (LocalContext.current as Activity)
 
     AlertDialog(
         onDismissRequest = {},
         title = { Text(text = stringResource(R.string.congratulations)) },
-        text = { Text(text = stringResource(R.string.you_scored, guesses)) },
-        modifier = modifier,
+        text = { Text(text = stringResource(
+            R.string.you_guessed, word,guesses)) },
         dismissButton = {
             TextButton(
                 onClick = {
@@ -171,7 +171,7 @@ private fun GuessesDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = {}) {
+            TextButton(onClick = onGuessAgain) {
                 Text(text = stringResource(R.string.play_again))
             }
         }
@@ -268,7 +268,7 @@ fun GameLayout(
                     disabledContainerColor = colorScheme.surface,
                 ),
                 onValueChange = {
-                    val awaiting = gameModel.awaitingCheck
+                    val awaiting = gameModel.inputBlocked
                     println("R1: onValueChange $awaiting")
                     if (awaiting)return@OutlinedTextField
                     gameModel.updateGuess(it.text)
