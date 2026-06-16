@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.update
 
 class GameModel : ViewModel() {
 
+    var badChar=false
     var currentScramble: String=""
     var guesses = 0
         get() = field
@@ -70,7 +71,11 @@ class GameModel : ViewModel() {
         }
         val listOf = listOf(thenGuess, nowGuess)
         println("R1: listOf = $listOf")
-        _gameState.update {
+        if (false){
+            this.badChar=badChar
+        }
+        else
+            _gameState.update {
             it.copy(
                 badChar = badChar,
             )
@@ -86,12 +91,16 @@ class GameModel : ViewModel() {
                 )
             }
         } else {
-            _gameState.update {
-                it.copy(
-                    hasGuessed = true,
-                    badChar = false,
-                )
+            if (false){
+                badChar = false
             }
+            else
+                _gameState.update {
+                    it.copy(
+                        hasGuessed = true,
+                        badChar = false,
+                    )
+                }
         }
 
     }
