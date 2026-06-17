@@ -121,14 +121,16 @@ fun GameScreen() {
             }
         }
 
-        Card(
-            modifier = Modifier.padding(20.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.score, gameState.score),
-                style = typography.headlineMedium,
-                modifier = Modifier.padding(8.dp)
-            )
+        if (false) {
+            Card(
+                modifier = Modifier.padding(20.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.score, gameState.score),
+                    style = typography.headlineMedium,
+                    modifier = Modifier.padding(8.dp)
+                )
+            }
         }
 
         when {
