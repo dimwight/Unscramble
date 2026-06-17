@@ -108,7 +108,7 @@ class GameModel : ViewModel() {
         _gameState.update {
             it.copy(
                 hasGuessed = false,
-                currentCount = it.currentCount.inc(),
+//                currentCount = it.currentCount.inc(),
             )
         }
         guesses=0

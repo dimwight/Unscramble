@@ -231,16 +231,18 @@ fun GameLayout(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(mediumPadding)
         ) {
-            Text(
-                modifier = Modifier
-                    .clip(shapes.medium)
-                    .background(colorScheme.surfaceTint)
-                    .padding(horizontal = 10.dp, vertical = 4.dp)
-                    .align(alignment = Alignment.End),
-                text = stringResource(R.string.word_count, gameState.currentCount),
-                style = typography.titleMedium,
-                color = colorScheme.onPrimary
-            )
+            if (false) {
+                Text(
+                    modifier = Modifier
+                        .clip(shapes.medium)
+                        .background(colorScheme.surfaceTint)
+                        .padding(horizontal = 10.dp, vertical = 4.dp)
+                        .align(alignment = Alignment.End),
+                    text = stringResource(R.string.word_count, gameState.currentCount),
+                    style = typography.titleMedium,
+                    color = colorScheme.onPrimary
+                )
+            }
             Text(
                 text = gameModel.currentScramble,
                 style = typography.displayMedium
