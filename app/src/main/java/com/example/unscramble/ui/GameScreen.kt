@@ -240,7 +240,7 @@ fun GameLayout(
                 color = colorScheme.onPrimary
             )
             Text(
-                text = gameState.currentScramble,
+                text = gameModel.currentScramble,
                 style = typography.displayMedium
             )
             Text(
@@ -249,7 +249,10 @@ fun GameLayout(
                 style = typography.titleMedium
             )
             val focusRequester = remember { FocusRequester() }
-            val badChar = gameState.badChar
+            val badChar =if (false){
+                gameModel.badChar
+            }
+            else gameState.badChar
             val scope = rememberCoroutineScope()
             val guess = gameModel.nowGuess
             OutlinedTextField(

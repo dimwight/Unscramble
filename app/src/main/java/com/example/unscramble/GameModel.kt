@@ -14,8 +14,9 @@ import kotlinx.coroutines.flow.update
 
 class GameModel : ViewModel() {
 
+    var badChar=false
+    var currentScramble: String=""
     var guesses = 0
-        get() = field
     var inputBlocked = false
     private val _gameState = MutableStateFlow(GameState())
     val gameState: StateFlow<GameState> = _gameState.asStateFlow()
@@ -27,7 +28,6 @@ class GameModel : ViewModel() {
 
     private var usedWords: MutableSet<String> = mutableSetOf()
     var currentWord: String=""
-        get() = field
 
     init {
         resetGame()
@@ -35,7 +35,7 @@ class GameModel : ViewModel() {
 
     fun resetGame() {
         usedWords.clear()
-        _gameState.value = GameState(currentScramble = pickRandomWordAndShuffle())
+        currentScramble = pickRandomWordAndShuffle()
     }
 
     fun updateGuess(update: String) {
@@ -51,20 +51,16 @@ class GameModel : ViewModel() {
     fun checkGuess() {
         inputBlocked = false
         println("R1: checkGuess $inputBlocked")
-        _gameState.update {
-            it.copy(
-                guesses = it.guesses.inc()
-            )
-        }
+        guesses++
         if (nowGuess.equals(currentWord, ignoreCase = true)) {
             val updatedScore = _gameState.value.score.plus(SCORE_INCREASE)
             updateStateForScore(updatedScore)
             return
         }
-        var guessChars = nowGuess.toCharArray()
+        val guessChars = nowGuess.toCharArray()
         val wordChars = currentWord.toCharArray()
         var badChar = false
-        for (at in 0..guessChars.size - 1) {
+        for (at in 0..<guessChars.size) {
             if (guessChars[at] != wordChars[at]) {
                 badChar = true
                 nowGuess = thenGuess
@@ -73,7 +69,11 @@ class GameModel : ViewModel() {
         }
         val listOf = listOf(thenGuess, nowGuess)
         println("R1: listOf = $listOf")
-        _gameState.update {
+        if (false){
+            this.badChar=badChar
+        }
+        else
+            _gameState.update {
             it.copy(
                 badChar = badChar,
             )
@@ -89,26 +89,29 @@ class GameModel : ViewModel() {
                 )
             }
         } else {
-            guesses = _gameState.value.guesses
-            _gameState.update {
-                it.copy(
-                    hasGuessed = true,
-                    guesses = 1,
-                    badChar = false,
-                )
+            if (false){
+                badChar = false
             }
+            else
+                _gameState.update {
+                    it.copy(
+                        hasGuessed = true,
+                        badChar = false,
+                    )
+                }
         }
 
     }
 
     fun continueGame() {
+        currentScramble = pickRandomWordAndShuffle()
         _gameState.update {
             it.copy(
                 hasGuessed = false,
-                currentScramble = pickRandomWordAndShuffle(),
                 currentCount = it.currentCount.inc(),
             )
         }
+        guesses=0
         thenGuess = ""
         nowGuess = ""
         updateGuess("")
