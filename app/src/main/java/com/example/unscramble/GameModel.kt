@@ -17,7 +17,6 @@ class GameModel : ViewModel() {
     var badChar=false
     var currentScramble: String=""
     var guesses = 0
-        get() = field
     var inputBlocked = false
     private val _gameState = MutableStateFlow(GameState())
     val gameState: StateFlow<GameState> = _gameState.asStateFlow()
@@ -29,7 +28,6 @@ class GameModel : ViewModel() {
 
     private var usedWords: MutableSet<String> = mutableSetOf()
     var currentWord: String=""
-        get() = field
 
     init {
         resetGame()
