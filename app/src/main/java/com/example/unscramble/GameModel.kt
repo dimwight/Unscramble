@@ -4,7 +4,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.example.unscramble.data.MAX_NO_OF_WORDS
 import com.example.unscramble.data.allWords
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,12 +28,7 @@ class GameModel : ViewModel() {
     var currentWord: String=""
 
     init {
-        resetGame()
-    }
-
-    fun resetGame() {
-        usedWords.clear()
-        currentScramble = pickRandomWordAndShuffle()
+        updateScramble()
     }
 
     fun updateGuess(update: String) {
@@ -52,9 +46,7 @@ class GameModel : ViewModel() {
         println("R1: checkGuess $inputBlocked")
         guesses++
         if (nowGuess.equals(currentWord, ignoreCase = true)) {
-//            val updatedScore = _gameState.value.score.plus(SCORE_INCREASE)
-//            updateStateForScore()
-            updateStateForGuessed()
+            updateStateForGuessed(true)
             return
         }
         val guessChars = nowGuess.toCharArray()
@@ -69,46 +61,30 @@ class GameModel : ViewModel() {
         }
         val listOf = listOf(thenGuess, nowGuess)
         println("R1: listOf = $listOf")
-        if (false){
-            this.badChar=badChar
-        }
-        else
-            _gameState.update {
+        _gameState.update {
             it.copy(
                 badChar = badChar,
             )
         }
     }
 
-    private fun updateStateForGuessed() {
-        if (false && usedWords.size == MAX_NO_OF_WORDS) {
-            _gameState.update {
-                it.copy(
-//                    score = score,
-                    isGameOver = true
-                )
-            }
-        } else {
-            if (false){
-                badChar = false
-            }
-            else
-                _gameState.update {
-                    it.copy(
-                        hasGuessed = true,
-                        badChar = false,
-                    )
-                }
+    private fun updateStateForGuessed(guessed: Boolean) {
+        _gameState.update {
+            it.copy(
+                hasGuessed = guessed,
+                badChar = false,
+                isSkip = !guessed
+            )
         }
-
     }
 
-    fun continueGame() {
+    fun updateScramble() {
         currentScramble = pickRandomWordAndShuffle()
         _gameState.update {
             it.copy(
                 hasGuessed = false,
-//                currentCount = it.currentCount.inc(),
+                isSkip = false,
+                badChar = false,
             )
         }
         guesses=0
@@ -116,14 +92,28 @@ class GameModel : ViewModel() {
         nowGuess = ""
         updateGuess("")
         inputBlocked = false
-        println("R1: updateStateForScore- $inputBlocked")
+        println("R1: - $inputBlocked")
     }
 
-    fun skipWord() {
-        updateStateForGuessed()
-        nowGuess = ""
+    fun skip() {
+        _gameState.update {
+            it.copy(
+//                hasGuessed = false,
+//                badChar = false,
+                isSkip = true
+            )
+        }
+//        nowGuess = ""
     }
 
+    fun unskip() {
+        _gameState.update {
+            it.copy(
+                isSkip = false
+            )
+        }
+
+    }
     private fun shuffleCurrentWord(word: String): String {
         val asChars = word.toCharArray()
         asChars.shuffle()
@@ -144,7 +134,6 @@ class GameModel : ViewModel() {
             shuffleCurrentWord(currentWord)
         }
     }
-
 }
 
 

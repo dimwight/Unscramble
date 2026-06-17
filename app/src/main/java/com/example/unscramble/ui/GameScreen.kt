@@ -16,7 +16,6 @@
 package com.example.unscramble.ui
 
 import android.app.Activity
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -46,7 +45,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
@@ -111,7 +109,7 @@ fun GameScreen() {
             }
 
             OutlinedButton(
-                onClick = { gameModel.skipWord() },
+                onClick = { gameModel.skip() },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
@@ -121,29 +119,19 @@ fun GameScreen() {
             }
         }
 
-        if (false) {
-            Card(
-                modifier = Modifier.padding(20.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.score, gameState.score),
-                    style = typography.headlineMedium,
-                    modifier = Modifier.padding(8.dp)
-                )
-            }
-        }
-
         when {
             gameState.hasGuessed -> {
-                GuessesDialog(
+                GuessedDialog(
                     guesses = gameModel.guesses,
                     word = gameModel.currentWord,
-                ) { gameModel.continueGame() }
+                    updateScramble = { gameModel.updateScramble() }
+                )
             }
-            gameState.isGameOver -> {
-                FinalScoreDialog(
-                    score = gameState.score,
-                    onPlayAgain = { gameModel.resetGame() }
+            gameState.isSkip -> {
+                SkipDialog(
+                    score = gameModel.guesses,
+                    updateScramble = { gameModel.updateScramble() },
+                    closeMe = { gameModel.unskip() }
                 )
             }
         }
@@ -151,10 +139,10 @@ fun GameScreen() {
 }
 
 @Composable
-private fun GuessesDialog(
+private fun GuessedDialog(
     guesses: Int,
     word: String,
-    onGuessAgain: () -> Unit,
+    updateScramble: () -> Unit,
 ) {
     val activity = (LocalContext.current as Activity)
 
@@ -173,17 +161,17 @@ private fun GuessesDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = onGuessAgain) {
+            TextButton(onClick = updateScramble) {
                 Text(text = stringResource(R.string.play_again))
             }
         }
     )
 }
 @Composable
-private fun FinalScoreDialog(
+private fun SkipDialog(
     score: Int,
-    onPlayAgain: () -> Unit,
-    modifier: Modifier = Modifier
+    updateScramble: () -> Unit,
+    closeMe: () -> Unit,
 ) {
     val activity = (LocalContext.current as Activity)
 
@@ -193,20 +181,18 @@ private fun FinalScoreDialog(
             // button. If you want to disable that functionality, simply use an empty
             // onCloseRequest.
         },
-        title = { Text(text = stringResource(R.string.congratulations)) },
-        text = { Text(text = stringResource(R.string.you_scored, score)) },
-        modifier = modifier,
+        title = { Text(text = stringResource(R.string.skipWord)) },
+        text = { Text(text = stringResource(R.string.abandon, score)) },
+        modifier = Modifier,
         dismissButton = {
             TextButton(
-                onClick = {
-                    activity.finish()
-                }
+                onClick = closeMe
             ) {
-                Text(text = stringResource(R.string.exit))
+                Text(text = stringResource(R.string.keep))
             }
         },
         confirmButton = {
-            TextButton(onClick = onPlayAgain) {
+            TextButton(onClick = updateScramble) {
                 Text(text = stringResource(R.string.play_again))
             }
         }
@@ -231,18 +217,6 @@ fun GameLayout(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(mediumPadding)
         ) {
-            if (false) {
-                Text(
-                    modifier = Modifier
-                        .clip(shapes.medium)
-                        .background(colorScheme.surfaceTint)
-                        .padding(horizontal = 10.dp, vertical = 4.dp)
-                        .align(alignment = Alignment.End),
-                    text = stringResource(R.string.word_count, gameState.currentCount),
-                    style = typography.titleMedium,
-                    color = colorScheme.onPrimary
-                )
-            }
             Text(
                 text = gameModel.currentScramble,
                 style = typography.displayMedium
