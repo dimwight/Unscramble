@@ -13,19 +13,23 @@ import kotlinx.coroutines.flow.update
 class GameModel : ViewModel() {
 
     var badChar=false
+        private set
     var currentScramble: String=""
+        private set
     var guesses = 0
+        private set
     var inputBlocked = false
+        private set
     private val _gameState = MutableStateFlow(GameState())
     val gameState: StateFlow<GameState> = _gameState.asStateFlow()
-
-    var thenGuess by mutableStateOf("")
+    var thenGuess =""
         private set
     var nowGuess by mutableStateOf("")
         private set
 
     private var usedWords: MutableSet<String> = mutableSetOf()
-    var currentWord: String=""
+    var currentWord =""
+        private set
 
     init {
         updateScramble()
@@ -46,7 +50,13 @@ class GameModel : ViewModel() {
         println("R1: checkGuess $inputBlocked")
         guesses++
         if (nowGuess.equals(currentWord, ignoreCase = true)) {
-            updateStateForGuessed(true)
+            _gameState.update {
+                it.copy(
+                    hasGuessed = true,
+                    badChar = false,
+//                    isSkip = false
+                )
+            }
             return
         }
         val guessChars = nowGuess.toCharArray()
@@ -135,6 +145,7 @@ class GameModel : ViewModel() {
         }
     }
 }
+private const val debug = true
 
 
 
