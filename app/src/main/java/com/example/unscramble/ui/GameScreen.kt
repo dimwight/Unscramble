@@ -229,7 +229,7 @@ fun GameLayout(
             val focusRequester = remember { FocusRequester() }
             val badChar = gameState.badChar
             val scope = rememberCoroutineScope()
-            val guess = gameModel.nowGuess
+            val guess = gameModel.guess
             OutlinedTextField(
                 value = TextFieldValue(
                     text = guess,

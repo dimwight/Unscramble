@@ -12,8 +12,6 @@ import kotlinx.coroutines.flow.update
 
 class GameModel : ViewModel() {
 
-    var badChar=false
-        private set
     var currentScramble: String=""
         private set
     var guesses = 0
@@ -24,7 +22,7 @@ class GameModel : ViewModel() {
     val gameState: StateFlow<GameState> = _gameState.asStateFlow()
     var thenGuess =""
         private set
-    var nowGuess by mutableStateOf("")
+    var guess by mutableStateOf("")
         private set
 
     private var usedWords: MutableSet<String> = mutableSetOf()
@@ -36,54 +34,39 @@ class GameModel : ViewModel() {
     }
 
     fun updateGuess(update: String) {
-        println("R1: update = $update")
-        println("R1: updateGuess $inputBlocked")
         if (inputBlocked) return
-        thenGuess = nowGuess
-        nowGuess = update.trim()
+        thenGuess = guess
+        guess = update.trim()
         inputBlocked = true
-        println("R1: updateGuess- $inputBlocked")
     }
 
     fun checkGuess() {
         inputBlocked = false
-        println("R1: checkGuess $inputBlocked")
         guesses++
-        if (nowGuess.equals(currentWord, ignoreCase = true)) {
+        if (guess.equals(currentWord, ignoreCase = true)) {
             _gameState.update {
                 it.copy(
                     hasGuessed = true,
                     badChar = false,
-//                    isSkip = false
                 )
             }
             return
         }
-        val guessChars = nowGuess.toCharArray()
+        val guessChars = guess.toCharArray()
         val wordChars = currentWord.toCharArray()
         var badChar = false
-        for (at in 0..<guessChars.size) {
-            if (guessChars[at] != wordChars[at]) {
+        for ((at, char) in guessChars.withIndex()) {
+            if (char != wordChars[at]) {
                 badChar = true
-                nowGuess = thenGuess
+                guess = thenGuess
                 break
             }
         }
-        val listOf = listOf(thenGuess, nowGuess)
+        val listOf = listOf(thenGuess, guess)
         println("R1: listOf = $listOf")
         _gameState.update {
             it.copy(
                 badChar = badChar,
-            )
-        }
-    }
-
-    private fun updateStateForGuessed(guessed: Boolean) {
-        _gameState.update {
-            it.copy(
-                hasGuessed = guessed,
-                badChar = false,
-                isSkip = !guessed
             )
         }
     }
@@ -99,21 +82,17 @@ class GameModel : ViewModel() {
         }
         guesses=0
         thenGuess = ""
-        nowGuess = ""
+        guess = ""
         updateGuess("")
         inputBlocked = false
-        println("R1: - $inputBlocked")
     }
 
     fun skip() {
         _gameState.update {
             it.copy(
-//                hasGuessed = false,
-//                badChar = false,
                 isSkip = true
             )
         }
-//        nowGuess = ""
     }
 
     fun unskip() {
@@ -134,7 +113,6 @@ class GameModel : ViewModel() {
     }
 
     private fun pickRandomWordAndShuffle(): String {
-        val debug = true
         currentWord = if (debug) "abc" else
             allWords.random().trim()
         return if (usedWords.contains(currentWord)) {
@@ -145,7 +123,7 @@ class GameModel : ViewModel() {
         }
     }
 }
-private const val debug = true
+private const val debug = false
 
 
 
