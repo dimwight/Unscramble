@@ -56,7 +56,7 @@ class GameModel : ViewModel() {
         val wordChars = currentWord.toCharArray()
         var badChar = false
         for ((at, char) in guessChars.withIndex()) {
-            if (char != wordChars[at]) {
+            if (at==wordChars.size|| char != wordChars[at]) {
                 badChar = true
                 guess = thenGuess
                 break
@@ -113,7 +113,7 @@ class GameModel : ViewModel() {
     }
 
     private fun pickRandomWordAndShuffle(): String {
-        currentWord = if (debug) "abc" else
+        currentWord = if (debug) "happen" else
             allWords.random().trim()
         return if (usedWords.contains(currentWord)) {
             pickRandomWordAndShuffle()
