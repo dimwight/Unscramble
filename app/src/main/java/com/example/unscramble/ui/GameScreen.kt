@@ -1,18 +1,3 @@
-/*
- * Copyright (C) 2023 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.example.unscramble.ui
 
 import android.app.Activity
@@ -26,7 +11,6 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -63,6 +47,7 @@ import com.example.unscramble.R
 import com.example.unscramble.ui.theme.UnscrambleTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun GameScreen() {
@@ -95,18 +80,6 @@ fun GameScreen() {
             verticalArrangement = Arrangement.spacedBy(mediumPadding),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-            if (false) {
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick = { gameModel.checkGuess() }
-                ) {
-                    Text(
-                        text = stringResource(R.string.submit),
-                        fontSize = 16.sp
-                    )
-                }
-            }
 
             OutlinedButton(
                 onClick = { gameModel.skip() },
@@ -173,7 +146,6 @@ private fun SkipDialog(
     updateScramble: () -> Unit,
     closeMe: () -> Unit,
 ) {
-    val activity = (LocalContext.current as Activity)
 
     AlertDialog(
         onDismissRequest = {
@@ -185,9 +157,7 @@ private fun SkipDialog(
         text = { Text(text = stringResource(R.string.abandon, score)) },
         modifier = Modifier,
         dismissButton = {
-            TextButton(
-                onClick = closeMe
-            ) {
+            TextButton(onClick = closeMe) {
                 Text(text = stringResource(R.string.keep))
             }
         },
@@ -251,7 +221,7 @@ fun GameLayout(
                     if (awaiting)return@OutlinedTextField
                     gameModel.updateGuess(it.text)
                     scope.launch {
-                        delay(250)
+                        delay(.25.seconds)
                         gameModel.checkGuess()
                     }
                 },
