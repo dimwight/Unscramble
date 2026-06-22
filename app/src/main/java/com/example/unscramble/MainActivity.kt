@@ -16,28 +16,124 @@
 
 package com.example.unscramble
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.example.unscramble.ui.ClassicAlertDialog
 import com.example.unscramble.ui.GameScreen
 import com.example.unscramble.ui.theme.UnscrambleTheme
 
 class MainActivity : ComponentActivity() {
+    var wide = true
+
+    @SuppressLint("SuspiciousIndentation")
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        setContent {
-            UnscrambleTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                ) {
-                    GameScreen()
+        if (false)
+            setContent {
+                UnscrambleTheme {
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                    ) {
+                        GameScreen()
+                    }
                 }
             }
-        }
+        else
+            setContent {
+                UnscrambleTheme() {
+                    Scaffold(
+                        modifier = Modifier.fillMaxSize()
+                    ) { innerPadding ->
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(innerPadding)
+                        ) {
+                            var showDialog by rememberSaveable {
+                                mutableStateOf(false)
+                            }
+                            Column() {
+                                Button(
+                                    onClick = {
+                                        wide=true
+                                        showDialog = true
+                                    }
+                                ) {
+                                    Text("Show wide")
+                                }
+                                Button(
+                                    onClick = {
+                                        wide=false
+                                        showDialog = true
+                                    }
+                                ) {
+                                    Text("Show tall")
+                                }
+
+                            }
+                            if (showDialog) {
+                                ClassicAlertDialog(
+                                    title = {
+                                        Text("Title")
+                                    },
+                                    text = {
+                                        Text("Message")
+                                    },
+                                    onDismissRequest = {
+                                        showDialog = false
+                                    },
+                                    positiveButton = {
+                                        TextButton(
+                                            onClick = {
+                                                showDialog = false
+                                            }
+                                        ) {
+                                            Text("Positive")
+                                        }
+                                    },
+                                    negativeButton = {
+                                        TextButton(
+                                            onClick = {
+                                                showDialog = false
+                                            }
+                                        ) {
+                                            Text("Negative")
+                                        }
+                                    },
+                                    neutralButton = {
+                                        TextButton(
+                                            onClick = {
+                                                showDialog = false
+                                            }
+                                        ) {
+                                            Text("Neutral")
+                                        }
+                                    },
+                                )
+                            }
+                        }
+                    }
+                }
+            }
     }
 }
