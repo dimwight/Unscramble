@@ -37,14 +37,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.unscramble.GameModel
 import com.example.unscramble.GameState
 import com.example.unscramble.R
-import com.example.unscramble.ui.theme.UnscrambleTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.seconds
@@ -146,27 +144,34 @@ private fun SkipDialog(
     updateScramble: () -> Unit,
     closeMe: () -> Unit,
 ) {
+    val activity = (LocalContext.current as Activity)
 
-    AlertDialog(
-        onDismissRequest = {
-            // Dismiss the dialog when the user clicks outside the dialog or on the back
-            // button. If you want to disable that functionality, simply use an empty
-            // onCloseRequest.
-        },
+    Dialog3(
         title = { Text(text = stringResource(R.string.skipWord)) },
         text = { Text(text = stringResource(R.string.abandon, score)) },
-        modifier = Modifier,
-        dismissButton = {
+        onDismissRequest = {
+        },
+        positiveButton = {
+            TextButton(onClick = updateScramble) {
+                Text(text = stringResource(R.string.play_again))
+            }
+        },
+        negativeButton = {
             TextButton(onClick = closeMe) {
                 Text(text = stringResource(R.string.keep))
             }
         },
-        confirmButton = {
-            TextButton(onClick = updateScramble) {
-                Text(text = stringResource(R.string.play_again))
+        neutralButton = {
+            TextButton(
+                onClick = {
+                    activity.finish()
+                }
+            ) {
+                Text(text = stringResource(R.string.exit))
             }
         }
     )
+
 }
 @Composable
 fun GameLayout(
@@ -243,10 +248,12 @@ fun GameLayout(
 }
 
 
-@Preview(showBackground = true)
-@Composable
-fun GameScreenPreview() {
-    UnscrambleTheme {
-        GameScreen()
-    }
-}
+
+
+
+
+
+
+
+
+

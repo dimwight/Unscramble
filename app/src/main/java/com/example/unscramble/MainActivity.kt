@@ -16,7 +16,6 @@
 
 package com.example.unscramble
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -36,106 +35,24 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.unscramble.ui.ClassicAlertDialog
+import com.example.unscramble.ui.Dialog3
 import com.example.unscramble.ui.GameScreen
 import com.example.unscramble.ui.theme.UnscrambleTheme
 
 class MainActivity : ComponentActivity() {
     var wide = true
 
-    @SuppressLint("SuspiciousIndentation")
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        if (false)
-            setContent {
-                UnscrambleTheme {
-                    Surface(
-                        modifier = Modifier.fillMaxSize(),
-                    ) {
-                        GameScreen()
-                    }
+        setContent {
+            UnscrambleTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                ) {
+                    GameScreen()
                 }
             }
-        else
-            setContent {
-                UnscrambleTheme() {
-                    Scaffold(
-                        modifier = Modifier.fillMaxSize()
-                    ) { innerPadding ->
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(innerPadding)
-                        ) {
-                            var showDialog by rememberSaveable {
-                                mutableStateOf(true)
-                            }
-                            if (false)
-                            Column() {
-                                Button(
-                                    onClick = {
-                                        wide=true
-                                        showDialog = true
-                                    }
-                                ) {
-                                    Text("Show wide")
-                                }
-                                Button(
-                                    onClick = {
-                                        wide=false
-                                        showDialog = true
-                                    }
-                                ) {
-                                    Text("Show tall")
-                                }
-
-                            }
-                            if (showDialog) {
-                                ClassicAlertDialog(
-                                    title = {
-                                        Text("Title")
-                                    },
-                                    text = {
-                                        Text("Message")
-                                    },
-                                    onDismissRequest = {
-                                        finish()
-//                                        showDialog = false
-                                    },
-                                    positiveButton = {
-                                        TextButton(
-                                            onClick = {
-                                                showDialog = false
-                                            }
-                                        ) {
-                                            Text("Positive")
-                                        }
-                                    },
-                                    negativeButton = {
-                                        TextButton(
-                                            onClick = {
-                                                showDialog = false
-                                            }
-                                        ) {
-                                            Text("Negative")
-                                        }
-                                    },
-                                    neutralButton = {
-                                        TextButton(
-                                            onClick = {
-                                                showDialog = false
-                                            }
-                                        ) {
-                                            Text("Neutral")
-                                        }
-                                    },
-                                )
-                            }
-                        }
-                    }
-                }
-            }
+        }
     }
 }

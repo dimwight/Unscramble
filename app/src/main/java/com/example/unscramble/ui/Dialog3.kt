@@ -10,11 +10,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
-import com.example.unscramble.MainActivity
 
 /**
  * Classic version of the dialog with positive, negative and neutral buttons.
@@ -25,7 +23,7 @@ import com.example.unscramble.MainActivity
  * Note: If you need more buttons than "is allowed" simply pass more of them into the same slot.
  */
 @Composable
-fun ClassicAlertDialog(
+fun Dialog3(
     onDismissRequest: () -> Unit,
     positiveButton: @Composable () -> Unit,
     modifier: Modifier = Modifier,
@@ -94,9 +92,8 @@ private fun AlertDialogButtonStack(
         content = buttons
     ) { measurables, constraints ->
         // Don't constrain child views further, measure them with given constraints.
-        // List of measured children
         val placeables = measurables.map { measurable ->
-            // Measure each children
+            // Measure each child
             measurable.measure(constraints)
         }
 
@@ -136,6 +133,7 @@ private fun AlertDialogButtonStack(
 
                     // Move the X coordinate by the currently placed button.
                     xPosition -= placeable.width
+                    println("R1: xPosition = $xPosition")
                 }
             }
         } else {
@@ -158,6 +156,7 @@ private fun AlertDialogButtonStack(
 
                     // Move the Y coordinate by the currently placed button.
                     yPosition += placeable.height
+                    println("R1: yPosition = $yPosition")
                 }
             }
         }
