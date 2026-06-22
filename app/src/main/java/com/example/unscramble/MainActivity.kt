@@ -70,8 +70,9 @@ class MainActivity : ComponentActivity() {
                                 .padding(innerPadding)
                         ) {
                             var showDialog by rememberSaveable {
-                                mutableStateOf(false)
+                                mutableStateOf(true)
                             }
+                            if (false)
                             Column() {
                                 Button(
                                     onClick = {
@@ -100,7 +101,8 @@ class MainActivity : ComponentActivity() {
                                         Text("Message")
                                     },
                                     onDismissRequest = {
-                                        showDialog = false
+                                        finish()
+//                                        showDialog = false
                                     },
                                     positiveButton = {
                                         TextButton(

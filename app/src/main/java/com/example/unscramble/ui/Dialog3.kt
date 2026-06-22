@@ -87,7 +87,8 @@ private fun AlertDialogButtonStack(
     modifier: Modifier = Modifier,
     buttons: @Composable () -> Unit,
 ) {
-    val wide =false //activity.wide
+    val wide =false
+
     Layout(
         modifier = modifier,
         content = buttons
