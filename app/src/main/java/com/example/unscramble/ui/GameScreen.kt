@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.unscramble.GameModel
 import com.example.unscramble.GameState
+import com.example.unscramble.MainActivity
 import com.example.unscramble.R
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -49,7 +50,12 @@ import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun GameScreen() {
-    val gameModel = viewModel() as GameModel
+    val activity = LocalContext.current as MainActivity
+    val gameModel = if (false) {
+        viewModel() as GameModel
+    } else {
+        activity.gameModel
+    }
     val gameState by gameModel.gameState.collectAsState()
     val mediumPadding = dimensionResource(R.dimen.padding_medium)
 

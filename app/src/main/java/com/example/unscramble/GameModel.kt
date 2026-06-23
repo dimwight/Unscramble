@@ -10,7 +10,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class GameModel : ViewModel() {
+class GameModel// : ViewModel
+    () {
 
     var currentScramble: String=""
         private set
@@ -113,7 +114,7 @@ class GameModel : ViewModel() {
     }
 
     private fun pickRandomWordAndShuffle(): String {
-        currentWord = if (debug) "happen" else
+        currentWord = if (debug) "abc" else
             allWords.random().trim()
         return if (usedWords.contains(currentWord)) {
             pickRandomWordAndShuffle()
@@ -123,7 +124,7 @@ class GameModel : ViewModel() {
         }
     }
 }
-private const val debug = false
+private const val debug = true
 
 
 
