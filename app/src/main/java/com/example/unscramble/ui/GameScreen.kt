@@ -1,22 +1,6 @@
-/*
- * Copyright (C) 2023 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.example.unscramble.ui
 
 import android.app.Activity
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,7 +11,6 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -46,7 +29,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
@@ -55,20 +37,25 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.unscramble.GameModel
 import com.example.unscramble.GameState
+import com.example.unscramble.MainActivity
 import com.example.unscramble.R
-import com.example.unscramble.ui.theme.UnscrambleTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun GameScreen() {
-    val gameModel = viewModel() as GameModel
+    val activity = LocalContext.current as MainActivity
+    val gameModel = if (false) {
+        viewModel() as GameModel
+    } else {
+        activity.gameModel
+    }
     val gameState by gameModel.gameState.collectAsState()
     val mediumPadding = dimensionResource(R.dimen.padding_medium)
 
@@ -98,20 +85,8 @@ fun GameScreen() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            if (false) {
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick = { gameModel.checkGuess() }
-                ) {
-                    Text(
-                        text = stringResource(R.string.submit),
-                        fontSize = 16.sp
-                    )
-                }
-            }
-
             OutlinedButton(
-                onClick = { gameModel.skipWord() },
+                onClick = { gameModel.skip() },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
@@ -121,27 +96,19 @@ fun GameScreen() {
             }
         }
 
-        Card(
-            modifier = Modifier.padding(20.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.score, gameState.score),
-                style = typography.headlineMedium,
-                modifier = Modifier.padding(8.dp)
-            )
-        }
-
         when {
             gameState.hasGuessed -> {
-                GuessesDialog(
+                GuessedDialog(
                     guesses = gameModel.guesses,
                     word = gameModel.currentWord,
-                ) { gameModel.continueGame() }
+                    updateScramble = { gameModel.updateScramble() }
+                )
             }
-            gameState.isGameOver -> {
-                FinalScoreDialog(
-                    score = gameState.score,
-                    onPlayAgain = { gameModel.resetGame() }
+            gameState.isSkip -> {
+                SkipDialog(
+                    score = gameModel.guesses,
+                    updateScramble = { gameModel.updateScramble() },
+                    closeMe = { gameModel.unskip() }
                 )
             }
         }
@@ -149,10 +116,10 @@ fun GameScreen() {
 }
 
 @Composable
-private fun GuessesDialog(
+private fun GuessedDialog(
     guesses: Int,
     word: String,
-    onGuessAgain: () -> Unit,
+    updateScramble: () -> Unit,
 ) {
     val activity = (LocalContext.current as Activity)
 
@@ -171,30 +138,36 @@ private fun GuessesDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = onGuessAgain) {
+            TextButton(onClick = updateScramble) {
                 Text(text = stringResource(R.string.play_again))
             }
         }
     )
 }
 @Composable
-private fun FinalScoreDialog(
+private fun SkipDialog(
     score: Int,
-    onPlayAgain: () -> Unit,
-    modifier: Modifier = Modifier
+    updateScramble: () -> Unit,
+    closeMe: () -> Unit,
 ) {
     val activity = (LocalContext.current as Activity)
 
-    AlertDialog(
+    Dialog3(
+        title = { Text(text = stringResource(R.string.skipWord)) },
+        text = { Text(text = stringResource(R.string.abandon, score)) },
         onDismissRequest = {
-            // Dismiss the dialog when the user clicks outside the dialog or on the back
-            // button. If you want to disable that functionality, simply use an empty
-            // onCloseRequest.
         },
-        title = { Text(text = stringResource(R.string.congratulations)) },
-        text = { Text(text = stringResource(R.string.you_scored, score)) },
-        modifier = modifier,
-        dismissButton = {
+        positiveButton = {
+            TextButton(onClick = updateScramble) {
+                Text(text = stringResource(R.string.play_again))
+            }
+        },
+        negativeButton = {
+            TextButton(onClick = closeMe) {
+                Text(text = stringResource(R.string.keep))
+            }
+        },
+        neutralButton = {
             TextButton(
                 onClick = {
                     activity.finish()
@@ -202,13 +175,9 @@ private fun FinalScoreDialog(
             ) {
                 Text(text = stringResource(R.string.exit))
             }
-        },
-        confirmButton = {
-            TextButton(onClick = onPlayAgain) {
-                Text(text = stringResource(R.string.play_again))
-            }
         }
     )
+
 }
 @Composable
 fun GameLayout(
@@ -230,16 +199,6 @@ fun GameLayout(
             modifier = Modifier.padding(mediumPadding)
         ) {
             Text(
-                modifier = Modifier
-                    .clip(shapes.medium)
-                    .background(colorScheme.surfaceTint)
-                    .padding(horizontal = 10.dp, vertical = 4.dp)
-                    .align(alignment = Alignment.End),
-                text = stringResource(R.string.word_count, gameState.currentCount),
-                style = typography.titleMedium,
-                color = colorScheme.onPrimary
-            )
-            Text(
                 text = gameModel.currentScramble,
                 style = typography.displayMedium
             )
@@ -249,12 +208,9 @@ fun GameLayout(
                 style = typography.titleMedium
             )
             val focusRequester = remember { FocusRequester() }
-            val badChar =if (false){
-                gameModel.badChar
-            }
-            else gameState.badChar
+            val badChar = gameState.badChar
             val scope = rememberCoroutineScope()
-            val guess = gameModel.nowGuess
+            val guess = gameModel.guess
             OutlinedTextField(
                 value = TextFieldValue(
                     text = guess,
@@ -276,7 +232,7 @@ fun GameLayout(
                     if (awaiting)return@OutlinedTextField
                     gameModel.updateGuess(it.text)
                     scope.launch {
-                        delay(250)
+                        delay(.25.seconds)
                         gameModel.checkGuess()
                     }
                 },
@@ -298,10 +254,12 @@ fun GameLayout(
 }
 
 
-@Preview(showBackground = true)
-@Composable
-fun GameScreenPreview() {
-    UnscrambleTheme {
-        GameScreen()
-    }
-}
+
+
+
+
+
+
+
+
+
